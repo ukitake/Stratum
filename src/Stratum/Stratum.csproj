@@ -1,0 +1,169 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{CD170368-9BA8-413B-901A-3F81D6B41EC3}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Stratum</RootNamespace>
+    <AssemblyName>Stratum</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="SharpDX">
+      <HintPath>..\..\lib\SharpDX\SharpDX.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.D3DCompiler">
+      <HintPath>..\..\lib\SharpDX\SharpDX.D3DCompiler.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Direct3D11">
+      <HintPath>..\..\lib\SharpDX\SharpDX.Direct3D11.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.DirectInput">
+      <HintPath>..\..\lib\SharpDX\SharpDX.DirectInput.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.DXGI">
+      <HintPath>..\..\lib\SharpDX\SharpDX.DXGI.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Toolkit">
+      <HintPath>..\..\lib\SharpDX\SharpDX.Toolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Toolkit.Compiler">
+      <HintPath>..\..\lib\SharpDX\SharpDX.Toolkit.Compiler.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Toolkit.Game">
+      <HintPath>..\..\lib\SharpDX\SharpDX.Toolkit.Game.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Toolkit.Graphics">
+      <HintPath>..\..\lib\SharpDX\SharpDX.Toolkit.Graphics.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Toolkit.Input">
+      <HintPath>..\..\lib\SharpDX\SharpDX.Toolkit.Input.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.XInput">
+      <HintPath>..\..\lib\SharpDX\SharpDX.XInput.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Math\CompGeom\BoundingVolumes\AxisAlignedBoundingBox.cs" />
+    <Compile Include="Math\CompGeom\BoundingVolumes\BoundingFrustum.cs" />
+    <Compile Include="Math\CompGeom\BoundingVolumes\BoundingSphere.cs" />
+    <Compile Include="Math\CompGeom\BoundingVolume.cs" />
+    <Compile Include="Math\CompGeom\Primitives\Cylinder.cs" />
+    <Compile Include="Math\CompGeom\Primitives\Edge.cs" />
+    <Compile Include="Math\CompGeom\IntersectionTests.cs" />
+    <Compile Include="Math\CompGeom\Primitives\Line.cs" />
+    <Compile Include="Math\CompGeom\Primitives\LineSegment.cs" />
+    <Compile Include="Math\CompGeom\Primitives\Plane.cs" />
+    <Compile Include="Math\CompGeom\Primitive.cs" />
+    <Compile Include="Math\CompGeom\Primitives\Ray.cs" />
+    <Compile Include="Math\CompGeom\Primitives\Triangle.cs" />
+    <Compile Include="Components\Component.cs" />
+    <Compile Include="Content\ContentManager.cs" />
+    <Compile Include="Content\FileSystemContentResolver.cs" />
+    <Compile Include="Content\IContentManager.cs" />
+    <Compile Include="Engine.cs" />
+    <Compile Include="GameLoop.cs" />
+    <Compile Include="Object\GameObject.cs" />
+    <Compile Include="Graphics\Cameras\Camera.cs" />
+    <Compile Include="Graphics\Cameras\PlanetCamera.cs" />
+    <Compile Include="Graphics\Cameras\PlanetViewController.cs" />
+    <Compile Include="Graphics\Cameras\TerrainViewController.cs" />
+    <Compile Include="Graphics\CommonVertexFormats.cs" />
+    <Compile Include="Graphics\Deferred\GeometryBuffer.cs" />
+    <Compile Include="Graphics\GraphicsContext.cs" />
+    <Compile Include="Graphics\Helpers\EffectLoader.cs" />
+    <Compile Include="Graphics\Helpers\FontLoader.cs" />
+    <Compile Include="Graphics\Helpers\TextureHelpers.cs" />
+    <Compile Include="Graphics\IGraphicsContext.cs" />
+    <Compile Include="Graphics\Interop\GraphicsDeviceService.cs" />
+    <Compile Include="Graphics\Interop\IFormsGraphicsService.cs" />
+    <Compile Include="Graphics\Interop\IWpfGraphicsDevice.cs" />
+    <Compile Include="Graphics\Lights\DirectionalLight.cs" />
+    <Compile Include="Graphics\RenderingEngine.cs" />
+    <Compile Include="IdPool.cs" />
+    <Compile Include="Input\GamepadContext.cs" />
+    <Compile Include="Input\IInputContext.cs" />
+    <Compile Include="Input\InputContext.cs" />
+    <Compile Include="Input\KeyboardContext.cs" />
+    <Compile Include="Input\MouseContext.cs" />
+    <Compile Include="Input\StratumKeyboardManager.cs" />
+    <Compile Include="Input\StratumKeyboardPlatform.cs" />
+    <Compile Include="Input\StratumKeyboardPlatformDesktop.cs" />
+    <Compile Include="Input\StratumMouseManager.cs" />
+    <Compile Include="Input\StratumMousePlatform.cs" />
+    <Compile Include="Input\StratumMousePlatformDesktop.cs" />
+    <Compile Include="IRender.cs" />
+    <Compile Include="IUpdate.cs" />
+    <Compile Include="Math\FPPrecisionHelper.cs" />
+    <Compile Include="Math\MathUtilD.cs" />
+    <Compile Include="Math\MatrixD.cs" />
+    <Compile Include="Math\Vector3D.cs" />
+    <Compile Include="Math\Vector4D.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Object\SceneNode.cs" />
+    <Compile Include="Object\Spatial.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WPFDXInterop\WPFDXInterop.csproj">
+      <Project>{cf0af1ec-3ebc-4512-9d90-bdbf77510b1b}</Project>
+      <Name>WPFDXInterop</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Graphics\Fonts\Arial16.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Graphics\Shaders\CopyTextureToTarget.fx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Graphics\Shaders\GBufferUber.fx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Graphics\Shaders\Skybox.fx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Graphics\Shaders\Wireframe.fx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

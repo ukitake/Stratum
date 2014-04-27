@@ -1,0 +1,16 @@
+﻿<UserControl x:Class="WPFDXInterop.DXControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d"  HorizontalAlignment="Left" VerticalAlignment="Top" >
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Image x:Name="rootImage" Stretch="None" HorizontalAlignment="Left" VerticalAlignment="Top" OpacityMask="White" />
+
+    </Grid>
+
+</UserControl>
