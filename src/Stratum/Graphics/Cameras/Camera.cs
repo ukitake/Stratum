@@ -40,6 +40,7 @@ namespace Stratum
             : this(context, fov, aspectRatio, nearPlane, farPlane)
         {
             this.Position = position;
+            this.PositionD = new Vector3D(position);
         }
 
         IGraphicsContext context;
@@ -50,6 +51,7 @@ namespace Stratum
         public float XSensitivity { get; set; }
 
         public Vector3 Position { get; set; }
+        public Vector3D PositionD { get; set; }
         public Vector3 LookAt { get; set; }
         public Vector3 Up { get; set; }
         public Vector3 Right { get; set; }
@@ -119,12 +121,13 @@ namespace Stratum
 
             float rtrigger = currentStates.Gamepad.RTrigger() == 0 ? 1f : currentStates.Gamepad.RTrigger();
 
-            Vector3 force = this.LookAt * l.Y * 20f; // thrust
-            force -= this.Right * l.X * 20f;
+            Vector3D force = new Vector3D(this.LookAt) * l.Y * 20.0; // thrust
+            force -= new Vector3D(this.Right) * l.X * 20.0;
 
             force *= dt * 0.1f * rtrigger;
 
-            this.Position += force * 0.01f;
+            this.PositionD += force * 0.01;
+            this.Position = this.PositionD.ToVector3(); 
         }
     }
 }

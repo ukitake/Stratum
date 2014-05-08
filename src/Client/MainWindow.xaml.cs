@@ -50,11 +50,11 @@ namespace Client
 
         void dxControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            Engine.Pause();
+            //Engine.Pause();
             IGraphicsContext context = Engine.GraphicsContext;
             IWpfGraphicsDevice device = Engine.GraphicsDeviceService;
             device.Resize((int)e.NewSize.Width, (int)e.NewSize.Height);
-            Engine.UnPause();
+            //Engine.UnPause();
         }
     }
 }

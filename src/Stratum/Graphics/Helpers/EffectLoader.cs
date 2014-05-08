@@ -9,6 +9,7 @@ using SharpDX.Toolkit.Graphics;
 
 namespace Stratum.Graphics
 {
+    // todo: Effects should be loaded through the content manager
     public static class EffectLoader
     {
         public static Effect Load(string filePathAndName)
@@ -23,7 +24,7 @@ namespace Stratum.Graphics
 
             EffectCompiler compiler = new EffectCompiler();
             var result = compiler.CompileFromFile(fullPath, EffectCompilerFlags.Debug);
-
+            
             if (result.HasErrors)
             {
                 var thing = result.Logger.Messages;

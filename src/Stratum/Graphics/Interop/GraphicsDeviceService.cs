@@ -47,8 +47,8 @@ namespace Stratum.Graphics
 
             graphicsDevice = GraphicsDevice.New(deviceInformation.Adapter, deviceInformation.DeviceCreationFlags);
             
-            renderTarget = RenderTarget2D.New(graphicsDevice, 800, 600, PixelFormat.B8G8R8A8.UNorm);
-            graphicsDevice.Presenter = new RenderTargetGraphicsPresenter(graphicsDevice, renderTarget, DepthFormat.Depth24Stencil8, false);
+            renderTarget = RenderTarget2D.New(graphicsDevice, 1920, 1080, PixelFormat.B8G8R8A8.UNorm);
+            graphicsDevice.Presenter = new RenderTargetGraphicsPresenter(graphicsDevice, renderTarget, DepthFormat.Depth32, false);
             
             dxDevice = (Device)typeof(GraphicsDevice).GetField("Device", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(GraphicsDevice);
             dxContext = (DeviceContext)typeof(GraphicsDevice).GetField("Context", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(GraphicsDevice);
@@ -59,6 +59,8 @@ namespace Stratum.Graphics
 
         public GraphicsDeviceService(System.Windows.Forms.Form form)
         {
+            var ad = GraphicsAdapter.Default;
+
             deviceInformation = new GraphicsDeviceInformation()
             {
                 GraphicsProfile = FeatureLevel.Level_11_0,

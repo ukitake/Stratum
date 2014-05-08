@@ -9,7 +9,6 @@ namespace Stratum
 {
     public interface IRender
     {
-        void Render(GameTime gameTime, IGraphicsContext context);
-        void RenderDebug(GameTime gameTime, IGraphicsContext context);
+        void QueueRenderCommands(GameTime gameTime, Renderer renderer, IGraphicsContext context);
     }
 }

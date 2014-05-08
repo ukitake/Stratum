@@ -230,6 +230,14 @@ namespace Stratum
             this.M33 = value.Z;
           }
         }
+
+        public MatrixD(Matrix m)
+        {
+            this.M11 = m.M11; this.M12 = m.M12; this.M13 = m.M13; this.M14 = m.M14;
+            this.M21 = m.M21; this.M22 = m.M22; this.M23 = m.M23; this.M24 = m.M24;
+            this.M31 = m.M31; this.M32 = m.M32; this.M33 = m.M33; this.M34 = m.M34;
+            this.M41 = m.M41; this.M42 = m.M42; this.M43 = m.M43; this.M44 = m.M44;
+        }
         
         /// <summary>
         /// Initializes a new instance of the struct.

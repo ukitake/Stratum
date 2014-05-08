@@ -9,7 +9,7 @@ using SharpDX.Serialization;
 namespace Stratum
 {
     [StructLayout(LayoutKind.Sequential, Pack=4)]
-    public struct Vector3D // : IEquatable<Vector3D>, IFormattable, IDataSerializable
+    public struct Vector3D
     {
         public static readonly int SizeInBytes = Marshal.SizeOf(typeof(Vector3D));
 
@@ -47,6 +47,13 @@ namespace Stratum
             X = x;
             Y = y;
             Z = z;
+        }
+
+        public Vector3D(Vector3 v)
+        {
+            X = v.X;
+            Y = v.Y;
+            Z = v.Z;
         }
 
         public double X;
@@ -114,6 +121,45 @@ namespace Stratum
         public Vector3 ToVector3()
         {
             return new Vector3((float)X, (float)Y, (float)Z);
+        }
+
+        public void Split(out Vector3 low, out Vector3 high)
+        {
+            float lowx = split_low(X), highx = split_high(X);
+            float lowy = split_low(Y), highy = split_high(Y);
+            float lowz = split_low(Z), highz = split_high(Z);
+
+            low = new Vector3(lowx, lowy, lowz);
+            high = new Vector3(highx, highy, highz);
+        }
+
+        private static unsafe float split_high(double d)
+        {
+            // reinterpret the double as a ulong
+            ulong num = *((ulong*)&d);
+
+            if (BitConverter.IsLittleEndian)
+                return *(((float*)(&num)) + 1);
+            else
+                return *(float*)&num;
+        }
+
+        private static unsafe float split_low(double d)
+        {
+            ulong num = *((ulong*)&d);
+
+            if (!BitConverter.IsLittleEndian)
+                return *(((float*)(&num)) + 1);
+            else
+                return *(float*)&num;
+        }
+
+        private static unsafe double merge(float high, float low)
+        {
+            uint l = *(uint*)&low;
+            uint h = *(uint*)&high;
+            ulong sum = ((ulong)h << 32) | l;
+            return *(double*)&sum;
         }
 
         public static void Negate(ref Vector3D value, out Vector3D result)

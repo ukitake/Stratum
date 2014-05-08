@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Stratum
 {
-    public class Component : IUpdate, IRender
+    public abstract class Component : IUpdate, IRender
     {
         internal Component()
         {
@@ -33,11 +33,7 @@ namespace Stratum
             Updated = false;
         }
 
-        public virtual void Render(GameTime gameTime, IGraphicsContext context)
-        {
-        }
-
-        public virtual void RenderDebug(GameTime gameTime, IGraphicsContext context)
+        public virtual void QueueRenderCommands(GameTime gameTime, Renderer renderer, IGraphicsContext context)
         {
         }
 

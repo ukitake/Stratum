@@ -12,6 +12,8 @@ using Stratum.Input;
 using Stratum.Content;
 using SharpDX.Toolkit.Graphics;
 using System.Collections.Concurrent;
+using Stratum.World.Earth;
+using Stratum.GIS;
 
 namespace Stratum
 {
@@ -36,6 +38,9 @@ namespace Stratum
         private static IContentManager contentManager;
         private static GraphicsDeviceService graphicsDeviceService;
 
+        private static SceneGraph sceneGraph;
+        private static Renderer renderer;
+
         private static ConcurrentDictionary<ulong, GameObject> objects = new ConcurrentDictionary<ulong,GameObject>();
         private static ConcurrentDictionary<ulong, Component> components = new ConcurrentDictionary<ulong,Component>();
 
@@ -48,6 +53,9 @@ namespace Stratum
         public static IGraphicsContext GraphicsContext { get { return graphicsContext; } }
         public static IContentManager ContentManager { get { return contentManager; } }
         public static GraphicsDeviceService GraphicsDeviceService { get { return graphicsDeviceService; } }
+
+        public static SceneGraph SceneGraph { get { return sceneGraph; } }
+        public static Renderer Renderer { get { return renderer; } }
 
         public static IEnumerable<GameObject> Objects { get { return objects.Values; } }
         public static IEnumerable<Component> Components { get { return components.Values; } }
@@ -102,7 +110,7 @@ namespace Stratum
             return null;
         }
 
-        private static void Delete(SceneNode sceneNode)
+        internal static void Delete(SceneNode sceneNode)
         {
             IdPool.Free(sceneNode.Id);
 
@@ -138,9 +146,18 @@ namespace Stratum
                 return;
 
             idPool = new Stratum.IdPool();
+            sceneGraph = new Stratum.SceneGraph();
 
             // init SharpDX
             BootstrapSharpDX();
+
+            renderer = new Stratum.Renderer();
+
+            var earth = CreateGameObject();
+            earth.AddComponent(new PlanetComponent());
+            SceneGraph.Insert(earth, null);
+
+            Engine.GraphicsContext.CurrentCamera = new PlanetCamera(RenderWGS84.EarthRadius);
 
             //worldEngine = new World();
             //Engine.Instance.AddService(worldEngine, typeof(IWorldEngine), typeof(World));
@@ -153,7 +170,18 @@ namespace Stratum
             if (isInitialized)
                 return;
 
+            idPool = new Stratum.IdPool();
+            sceneGraph = new Stratum.SceneGraph();
+
             BootstrapSharpDX(form);
+
+            renderer = new Stratum.Renderer();
+
+            var earth = CreateGameObject();
+            earth.AddComponent(new PlanetComponent());
+            SceneGraph.Insert(earth, null);
+
+            Engine.GraphicsContext.CurrentCamera = new PlanetCamera(RenderWGS84.EarthRadius);
 
             //worldEngine = new World();
             //Engine.Instance.AddService(worldEngine, typeof(IWorldEngine), typeof(World));
@@ -166,17 +194,25 @@ namespace Stratum
         public void Start()
         {
             GameLoop engineLoop = new GameLoop();
+            engineLoop.IsFixedTimeStep = false;
+            renderer.StartFramerateCounter();
             engineLoop.Start();
         }
 
         public void Update(GameTime gameTime)
         {
             inputContext.Update(gameTime);
+            sceneGraph.Update(gameTime);
+
+            // update the render context to have current matrices
+            graphicsContext.RenderContext.Update(gameTime);
+
             //worldEngine.Update(gameTime);
         }
 
         public void Render(GameTime gameTime)
         {
+            renderer.Render(gameTime, graphicsContext);
             //worldEngine.Render(gameTime, Resolve<IGraphicsContext>());
         }
 

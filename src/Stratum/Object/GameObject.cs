@@ -14,12 +14,25 @@ namespace Stratum
         internal GameObject()
             : base(null)
         {
+            components = new List<Component>();
         }
 
         internal GameObject(SceneNode parent)
             : base(parent)
         {
             components = new List<Component>();
+        }
+
+        public void AddComponent(Component component)
+        {
+            components.Add(component);
+            component.Object = this;
+        }
+
+        public void RemoveComponent(Component component)
+        {
+            components.Remove(component);
+            component.Object = null;
         }
 
         public override void Update(GameTime gameTime)
@@ -31,13 +44,12 @@ namespace Stratum
             // Updates World if necessary
             base.Update(gameTime);
 
-            foreach (GameObject @object in Children)
-                @object.Update(gameTime);
-
-            PostUpdate(gameTime);
+            // Explicitly do not Update children... SceneGraph ensures 
+            // a depth-first Update scheme with PostUpdate called on the 
+            // way back up
         }
 
-        protected override void PostUpdate(GameTime gameTime)
+        public override void PostUpdate(GameTime gameTime)
         {
             foreach (Component component in components)
                 component.PostUpdate(gameTime);
@@ -48,8 +60,16 @@ namespace Stratum
 
         internal override void Delete()
         {
+            Parent.RemoveChild(this);
+
             foreach (Component component in components)
                 Engine.Delete(component);
+        }
+
+        public override void QueueRenderCommands(GameTime gameTime, Renderer renderer, Graphics.IGraphicsContext context)
+        {
+            foreach (var component in components)
+                component.QueueRenderCommands(gameTime, renderer, context);
         }
     }
 }

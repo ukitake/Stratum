@@ -21,6 +21,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,10 +33,17 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BruTile">
+      <HintPath>..\..\lib\SharpMap\BruTile.dll</HintPath>
+    </Reference>
+    <Reference Include="BruTile.Desktop">
+      <HintPath>..\..\lib\SharpMap\BruTile.Desktop.dll</HintPath>
+    </Reference>
     <Reference Include="SharpDX">
       <HintPath>..\..\lib\SharpDX\SharpDX.dll</HintPath>
     </Reference>
-    <Reference Include="SharpDX.D3DCompiler">
+    <Reference Include="SharpDX.D3DCompiler, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\SharpDX\SharpDX.D3DCompiler.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct3D11">
@@ -75,6 +84,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\IRenderableComponent.cs" />
+    <Compile Include="Components\RenderableComponent.cs" />
+    <Compile Include="GIS\LatLon.cs" />
+    <Compile Include="GIS\LatLonAlt.cs" />
+    <Compile Include="GIS\RenderWGS84.cs" />
+    <Compile Include="GIS\WGS84.cs" />
+    <Compile Include="Graphics\IRenderContext.cs" />
+    <Compile Include="Graphics\RenderCollection.cs" />
+    <Compile Include="Graphics\RenderCommands\Interfaces\IRenderCommand.cs" />
+    <Compile Include="Graphics\RenderCommands\Interfaces\IRenderDeferredCommand.cs" />
+    <Compile Include="Graphics\RenderCommands\RenderCommand.cs" />
+    <Compile Include="Graphics\RenderCommands\RenderDeferredCommand.cs" />
+    <Compile Include="Graphics\RenderCommands\RenderDeferredIndexedCommand.cs" />
+    <Compile Include="Graphics\RenderCommands\RenderIndexedCommand.cs" />
+    <Compile Include="Graphics\RenderCommands\RenderIndexedInstancedCommand.cs" />
+    <Compile Include="Graphics\RenderCommands\RenderInstancedCommand.cs" />
+    <Compile Include="Graphics\RenderContext.cs" />
     <Compile Include="Math\CompGeom\BoundingVolumes\AxisAlignedBoundingBox.cs" />
     <Compile Include="Math\CompGeom\BoundingVolumes\BoundingFrustum.cs" />
     <Compile Include="Math\CompGeom\BoundingVolumes\BoundingSphere.cs" />
@@ -110,7 +136,7 @@
     <Compile Include="Graphics\Interop\IFormsGraphicsService.cs" />
     <Compile Include="Graphics\Interop\IWpfGraphicsDevice.cs" />
     <Compile Include="Graphics\Lights\DirectionalLight.cs" />
-    <Compile Include="Graphics\RenderingEngine.cs" />
+    <Compile Include="Graphics\Renderer.cs" />
     <Compile Include="IdPool.cs" />
     <Compile Include="Input\GamepadContext.cs" />
     <Compile Include="Input\IInputContext.cs" />
@@ -133,6 +159,18 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Object\SceneNode.cs" />
     <Compile Include="Object\Spatial.cs" />
+    <Compile Include="SceneGraph.cs" />
+    <Compile Include="World\Earth\CesiumTerrainNode.cs" />
+    <Compile Include="World\Earth\PlanetComponent.cs" />
+    <Compile Include="World\Earth\Quadrant.cs" />
+    <Compile Include="World\Space\Astronomy.cs" />
+    <Compile Include="World\Atmosphere\Atmosphere.cs" />
+    <Compile Include="World\Space\Skybox.cs" />
+    <Compile Include="World\Space\Sun.cs" />
+    <Compile Include="World\Space\SunCalculator.cs" />
+    <Compile Include="World\Earth\TerrainNode.cs" />
+    <Compile Include="World\Earth\TerrainVertex.cs" />
+    <Compile Include="World\Earth\Tile.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WPFDXInterop\WPFDXInterop.csproj">
@@ -142,6 +180,9 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Content Include="d3dcompiler_46.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Graphics\Fonts\Arial16.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -157,8 +198,48 @@
     <Content Include="Graphics\Shaders\Wireframe.fx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="World\Atmosphere\Shaders\atmosphere.fx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="World\Atmosphere\Shaders\Common.fx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="World\Atmosphere\Shaders\Constants.fx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="World\Atmosphere\Shaders\copyInscatter1.fx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="World\Atmosphere\Shaders\copyInscatterN.fx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="World\Atmosphere\Shaders\copyIrradiance.fx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="World\Atmosphere\Shaders\inscatter1.fx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="World\Atmosphere\Shaders\inscatterN.fx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="World\Atmosphere\Shaders\inscatterS.fx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="World\Atmosphere\Shaders\irradiance1.fx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="World\Atmosphere\Shaders\irradianceN.fx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="World\Atmosphere\Shaders\transmittance.fx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

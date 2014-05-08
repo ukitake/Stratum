@@ -1589,7 +1589,7 @@
         </member>
         <member name="T:SharpDX.Toolkit.Graphics.GraphicsPresenter">
             <summary>
-            This class is a front end to <see cref="T:SharpDX.DXGI.SwapChain"/> and <see cref="!:SwapChain1"/>.
+            This class is a front end to <see cref="T:SharpDX.DXGI.SwapChain"/> and <see cref="T:SharpDX.DXGI.SwapChain1"/>.
             </summary>
             <remarks>
             In order to create a new <see cref="T:SharpDX.Toolkit.Graphics.GraphicsPresenter"/>, a <see cref="P:SharpDX.Toolkit.Graphics.GraphicsPresenter.GraphicsDevice"/> should have been initialized first.
@@ -1654,7 +1654,7 @@
         </member>
         <member name="P:SharpDX.Toolkit.Graphics.GraphicsPresenter.NativePresenter">
             <summary>
-            Gets the underlying native presenter (can be a <see cref="T:SharpDX.DXGI.SwapChain"/> or <see cref="!:SharpDX.DXGI.SwapChain1"/> or null, depending on the platform).
+            Gets the underlying native presenter (can be a <see cref="T:SharpDX.DXGI.SwapChain"/> or <see cref="T:SharpDX.DXGI.SwapChain1"/> or null, depending on the platform).
             </summary>
             <value>The native presenter.</value>
         </member>

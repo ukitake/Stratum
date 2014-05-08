@@ -14,6 +14,8 @@ namespace Stratum.Graphics
     {
         public GraphicsContext(IGraphicsDeviceService service, Device d3dDevice, DeviceContext d3dContext)
         {
+            this.RenderContext = new RenderContext();
+
             this.GraphicsService = service;
             this.Device = service.GraphicsDevice;
             this.D3D11Device = d3dDevice;
@@ -28,6 +30,8 @@ namespace Stratum.Graphics
         public IGraphicsDeviceService GraphicsService { get; private set; }
 
         public IImageSourcePresenter ImageSourcePresenter { get; set; }
+
+        public IRenderContext RenderContext { get; private set; }
 
         public SharpDX.Toolkit.Graphics.GraphicsDevice Device { get; private set; }
 

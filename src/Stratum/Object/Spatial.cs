@@ -15,6 +15,8 @@ namespace Stratum
 
         internal Spatial()
         {
+            Local = MatrixD.Identity;
+            World = MatrixD.Identity;
         }
 
         public MatrixD Local 
@@ -50,6 +52,6 @@ namespace Stratum
         protected bool WorldBoundIsCurrent { get; set; }
 
         public abstract void Update(GameTime gameTime);
-        protected abstract void PostUpdate(GameTime gameTime);
+        public abstract void PostUpdate(GameTime gameTime);
     }
 }

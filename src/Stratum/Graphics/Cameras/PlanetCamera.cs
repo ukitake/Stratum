@@ -38,9 +38,11 @@ namespace Stratum
         public static Vector3D fromLatLon(double lon, double lat)
         {
             Vector3D ret = new Vector3D();
-            ret.X = 6359.99 * Math.Cos(MathUtilD.DegreesToRadians(lat)) * Math.Cos(MathUtilD.DegreesToRadians(lon));
-            ret.Y = 6359.99 * Math.Sin(MathUtilD.DegreesToRadians(lat));
-            ret.Z = 6359.99 * Math.Cos(MathUtilD.DegreesToRadians(lat)) * Math.Sin(MathUtilD.DegreesToRadians(lon));
+            var latRad = MathUtilD.DegreesToRadians(lat);
+            var lonRad = MathUtilD.DegreesToRadians(lon);
+            ret.X = 6359.99 * Math.Cos(latRad) * Math.Cos(lonRad);
+            ret.Y = 6359.99 * Math.Sin(latRad);
+            ret.Z = 6359.99 * Math.Cos(latRad) * Math.Sin(lonRad);
             return ret;
         }
 
@@ -58,6 +60,7 @@ namespace Stratum
 
             pos = pos * (R + _h);
 
+            PositionD = pos;
             Position = pos.ToVector3();
 
             Vector3D right = Vector3D.Cross(Vector3D.UnitY, N);

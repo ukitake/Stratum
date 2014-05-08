@@ -24,10 +24,5 @@ namespace Stratum.Content
         {
             return sharpContent.Load<T>(filePath);
         }
-
-        //public T Load<T>(IMapEntity mapEntity, string filePath) where T : class, IDisposable
-        //{
-        //    return null;
-        //}
     }
 }

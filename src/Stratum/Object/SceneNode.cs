@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Stratum
 {
-    public abstract class SceneNode : Spatial
+    public abstract class SceneNode : Spatial, IRender
     {
         private ulong id;
         protected SceneNode parent;
@@ -57,7 +57,7 @@ namespace Stratum
         /// the entire subtree rooted at this SceneNode
         /// </summary>
         /// <param name="newParent"></param>
-        public virtual void ChangeParent(SceneNode newParent)
+        internal virtual void ChangeParent(SceneNode newParent)
         {
             if (newParent == null)
                 throw new ArgumentNullException();
@@ -75,7 +75,7 @@ namespace Stratum
             get { return children; }
         }
 
-        public void AddChild(SceneNode newChild)
+        internal void AddChild(SceneNode newChild)
         {
             // O(N)
             // validate that we aren't adding a duplicate node
@@ -84,7 +84,7 @@ namespace Stratum
             children.Add(newChild);
         }
 
-        public void RemoveChild(SceneNode childToRemove)
+        internal void RemoveChild(SceneNode childToRemove)
         {
             if (!children.Remove(childToRemove))
                 throw new InvalidOperationException("Node you are trying to remove is not a child of this node"); 
@@ -95,12 +95,16 @@ namespace Stratum
             if (!WorldIsCurrent)
             {
                 // compose parent's world with our local to get our world
-                World = MatrixD.Multiply(Parent.World, Local);
+                if (Parent != null)
+                    World = MatrixD.Multiply(Parent.World, Local);
+                else
+                    World = Local;
+
                 WorldIsCurrent = true;
             }
         }
 
-        protected override void PostUpdate(GameTime gameTime)
+        public override void PostUpdate(GameTime gameTime)
         {
             if (parent != null)
             {
@@ -112,28 +116,14 @@ namespace Stratum
         {
         }
 
-        public override bool Equals(object obj)
-        {
-            SceneNode other = obj as SceneNode;
-            if (other != null)
-                return id == other.id;
-
-            return false;
-        }
-
         public override int GetHashCode()
         {
             return id.GetHashCode();
         }
 
-        public static bool operator ==(SceneNode n1, SceneNode n2)
+        public virtual void QueueRenderCommands(GameTime gameTime, Renderer renderer, Graphics.IGraphicsContext context)
         {
-            return n1.id == n2.id;
-        }
 
-        public static bool operator !=(SceneNode n1, SceneNode n2)
-        {
-            return n1.id != n2.id;
         }
     }
 }

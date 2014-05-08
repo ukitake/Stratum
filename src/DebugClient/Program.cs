@@ -25,8 +25,8 @@ namespace DebugClient
             form.Height = 1080;
             Engine.Instance.Initialize(form);
             service = Engine.GraphicsDeviceService;
-            form.ResizeBegin += (o, e) => { Engine.Pause(); };
-            form.ResizeEnd += (o, e) => { Engine.UnPause(); };
+            //form.ResizeBegin += (o, e) => { Engine.Pause(); };
+            //form.ResizeEnd += (o, e) => { Engine.UnPause(); };
             form.SizeChanged += form_SizeChanged;
 
             Engine.Instance.Start();

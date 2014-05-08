@@ -728,7 +728,8 @@ GBuffer PS_TERRAIN(PS_IN_TERRAIN input)
 
 	float2 texCoords = input.tex;
 
-	output.Albedo = float4(input.tex, 0, 1);
+	//output.Albedo = float4(input.tex, 0, 1);
+	output.Albedo = float4(1, 1, 1, 1);
 	return output;
 }
 

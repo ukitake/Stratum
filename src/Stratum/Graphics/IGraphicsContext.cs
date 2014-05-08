@@ -14,6 +14,8 @@ namespace Stratum.Graphics
         IGraphicsDeviceService GraphicsService { get; }
         IImageSourcePresenter ImageSourcePresenter { get; set; }
 
+        IRenderContext RenderContext { get; }
+
         GraphicsDevice Device { get; }
         SpriteBatch SpriteBatch { get; }
 
