@@ -342,34 +342,6 @@ namespace Stratum
             return result;
         }
 
-        public static void Transform(ref Vector3D vector, ref Quaternion rotation, out Vector3D result)
-        {
-            float x = rotation.X + rotation.X;
-            float y = rotation.Y + rotation.Y;
-            float z = rotation.Z + rotation.Z;
-            float wx = rotation.W * x;
-            float wy = rotation.W * y;
-            float wz = rotation.W * z;
-            float xx = rotation.X * x;
-            float xy = rotation.X * y;
-            float xz = rotation.X * z;
-            float yy = rotation.Y * y;
-            float yz = rotation.Y * z;
-            float zz = rotation.Z * z;
-
-            result = new Vector3D(
-                ((vector.X * ((1.0d - yy) - zz)) + (vector.Y * (xy - wz))) + (vector.Z * (xz + wy)),
-                ((vector.X * (xy + wz)) + (vector.Y * ((1.0d - xx) - zz))) + (vector.Z * (yz - wx)),
-                ((vector.X * (xz - wy)) + (vector.Y * (yz + wx))) + (vector.Z * ((1.0d - xx) - yy)));
-        }
-
-        public static Vector3D Transform(Vector3D vector, Quaternion rotation)
-        {
-            Vector3D result;
-            Transform(ref vector, ref rotation, out result);
-            return result;
-        }
-
         public static void Add(ref Vector3D left, ref Vector3D right, out Vector3D result)
         {
             result = new Vector3D(left.X + right.X, left.Y + right.Y, left.Z + right.Z);
@@ -457,6 +429,246 @@ namespace Stratum
                 sum += vecs[i];
 
             return sum / vecs.Length;
+        }
+
+        /// <summary>
+        /// Transforms a 3D vector by the given <see cref="SharpDX.Quaternion"/> rotation.
+        /// </summary>
+        /// <param name="vector">The vector to rotate.</param>
+        /// <param name="rotation">The <see cref="SharpDX.Quaternion"/> rotation to apply.</param>
+        /// <param name="result">When the method completes, contains the transformed <see cref="SharpDX.Vector4"/>.</param>
+        public static void Transform(ref Vector3D vector, ref QuaternionD rotation, out Vector3D result)
+        {
+            double x = rotation.X + rotation.X;
+            double y = rotation.Y + rotation.Y;
+            double z = rotation.Z + rotation.Z;
+            double wx = rotation.W * x;
+            double wy = rotation.W * y;
+            double wz = rotation.W * z;
+            double xx = rotation.X * x;
+            double xy = rotation.X * y;
+            double xz = rotation.X * z;
+            double yy = rotation.Y * y;
+            double yz = rotation.Y * z;
+            double zz = rotation.Z * z;
+
+            result = new Vector3D(
+                ((vector.X * ((1.0 - yy) - zz)) + (vector.Y * (xy - wz))) + (vector.Z * (xz + wy)),
+                ((vector.X * (xy + wz)) + (vector.Y * ((1.0 - xx) - zz))) + (vector.Z * (yz - wx)),
+                ((vector.X * (xz - wy)) + (vector.Y * (yz + wx))) + (vector.Z * ((1.0 - xx) - yy)));
+        }
+
+        /// <summary>
+        /// Transforms a 3D vector by the given <see cref="SharpDX.Quaternion"/> rotation.
+        /// </summary>
+        /// <param name="vector">The vector to rotate.</param>
+        /// <param name="rotation">The <see cref="SharpDX.Quaternion"/> rotation to apply.</param>
+        /// <returns>The transformed <see cref="SharpDX.Vector4"/>.</returns>
+        public static Vector3D Transform(Vector3D vector, QuaternionD rotation)
+        {
+            Vector3D result;
+            Transform(ref vector, ref rotation, out result);
+            return result;
+        }
+
+        public static void Transform3x3(ref Vector3D vector, ref MatrixD transform, out Vector3D result)
+        {
+            result = new Vector3D((vector.X * transform.M11) + (vector.Y * transform.M21) + (vector.Z * transform.M31),
+                                    (vector.X * transform.M12) + (vector.Y * transform.M22) + (vector.Z * transform.M32),
+                                    (vector.X * transform.M13) + (vector.Y * transform.M23) + (vector.Z * transform.M33)
+                                );
+        }
+
+        public static Vector3D Transform3x3(Vector3D vector, MatrixD transform)
+        {
+            Vector3D result;
+            Transform3x3(ref vector, ref transform, out result);
+            return result;
+        }
+
+        public static void Transform(ref Vector3D vector, ref MatrixD transform, out Vector3D result)
+        {
+            Vector4D intermediate;
+            Transform(ref vector, ref transform, out intermediate);
+            result = (Vector3D)intermediate;
+        }
+
+        public static void Transform(ref Vector3D vector, ref MatrixD transform, out Vector4D result)
+        {
+            result = new Vector4D(
+                (vector.X * transform.M11) + (vector.Y * transform.M21) + (vector.Z * transform.M31) + transform.M41,
+                (vector.X * transform.M12) + (vector.Y * transform.M22) + (vector.Z * transform.M32) + transform.M42,
+                (vector.X * transform.M13) + (vector.Y * transform.M23) + (vector.Z * transform.M33) + transform.M43,
+                (vector.X * transform.M14) + (vector.Y * transform.M24) + (vector.Z * transform.M34) + transform.M44);
+        }
+
+        public static Vector4D Transform(Vector3D vector, MatrixD transform)
+        {
+            Vector4D result;
+            Transform(ref vector, ref transform, out result);
+            return result;
+        }
+
+        public static void Transform(Vector3D[] source, ref MatrixD transform, Vector4D[] destination)
+        {
+            if (source == null)
+                throw new ArgumentNullException("source");
+            if (destination == null)
+                throw new ArgumentNullException("destination");
+            if (destination.Length < source.Length)
+                throw new ArgumentOutOfRangeException("destination", "The destination array must be of same length or larger length than the source array.");
+
+            for (int i = 0; i < source.Length; ++i)
+            {
+                Transform(ref source[i], ref transform, out destination[i]);
+            }
+        }
+
+        /// <summary>
+        /// Performs a coordinate transformation using the given <see cref="SharpDX.Matrix"/>.
+        /// </summary>
+        /// <param name="coordinate">The coordinate vector to transform.</param>
+        /// <param name="transform">The transformation <see cref="SharpDX.Matrix"/>.</param>
+        /// <param name="result">When the method completes, contains the transformed coordinates.</param>
+        /// <remarks>
+        /// A coordinate transform performs the transformation with the assumption that the w component
+        /// is one. The four dimensional vector obtained from the transformation operation has each
+        /// component in the vector divided by the w component. This forces the w component to be one and
+        /// therefore makes the vector homogeneous. The homogeneous vector is often preferred when working
+        /// with coordinates as the w component can safely be ignored.
+        /// </remarks>
+        public static void TransformCoordinate(ref Vector3D coordinate, ref MatrixD transform, out Vector3D result)
+        {
+            Vector4D vector = new Vector4D();
+            vector.X = (coordinate.X * transform.M11) + (coordinate.Y * transform.M21) + (coordinate.Z * transform.M31) + transform.M41;
+            vector.Y = (coordinate.X * transform.M12) + (coordinate.Y * transform.M22) + (coordinate.Z * transform.M32) + transform.M42;
+            vector.Z = (coordinate.X * transform.M13) + (coordinate.Y * transform.M23) + (coordinate.Z * transform.M33) + transform.M43;
+            vector.W = 1f / ((coordinate.X * transform.M14) + (coordinate.Y * transform.M24) + (coordinate.Z * transform.M34) + transform.M44);
+
+            result = new Vector3D(vector.X * vector.W, vector.Y * vector.W, vector.Z * vector.W);
+        }
+
+        /// <summary>
+        /// Performs a coordinate transformation using the given <see cref="SharpDX.Matrix"/>.
+        /// </summary>
+        /// <param name="coordinate">The coordinate vector to transform.</param>
+        /// <param name="transform">The transformation <see cref="SharpDX.Matrix"/>.</param>
+        /// <returns>The transformed coordinates.</returns>
+        /// <remarks>
+        /// A coordinate transform performs the transformation with the assumption that the w component
+        /// is one. The four dimensional vector obtained from the transformation operation has each
+        /// component in the vector divided by the w component. This forces the w component to be one and
+        /// therefore makes the vector homogeneous. The homogeneous vector is often preferred when working
+        /// with coordinates as the w component can safely be ignored.
+        /// </remarks>
+        public static Vector3D TransformCoordinate(Vector3D coordinate, MatrixD transform)
+        {
+            Vector3D result;
+            TransformCoordinate(ref coordinate, ref transform, out result);
+            return result;
+        }
+
+        /// <summary>
+        /// Performs a coordinate transformation on an array of vectors using the given <see cref="SharpDX.Matrix"/>.
+        /// </summary>
+        /// <param name="source">The array of coordinate vectors to transform.</param>
+        /// <param name="transform">The transformation <see cref="SharpDX.Matrix"/>.</param>
+        /// <param name="destination">The array for which the transformed vectors are stored.
+        /// This array may be the same array as <paramref name="source"/>.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="source"/> or <paramref name="destination"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="destination"/> is shorter in length than <paramref name="source"/>.</exception>
+        /// <remarks>
+        /// A coordinate transform performs the transformation with the assumption that the w component
+        /// is one. The four dimensional vector obtained from the transformation operation has each
+        /// component in the vector divided by the w component. This forces the w component to be one and
+        /// therefore makes the vector homogeneous. The homogeneous vector is often preferred when working
+        /// with coordinates as the w component can safely be ignored.
+        /// </remarks>
+        public static void TransformCoordinate(Vector3D[] source, ref MatrixD transform, Vector3D[] destination)
+        {
+            if (source == null)
+                throw new ArgumentNullException("source");
+            if (destination == null)
+                throw new ArgumentNullException("destination");
+            if (destination.Length < source.Length)
+                throw new ArgumentOutOfRangeException("destination", "The destination array must be of same length or larger length than the source array.");
+
+            for (int i = 0; i < source.Length; ++i)
+            {
+                TransformCoordinate(ref source[i], ref transform, out destination[i]);
+            }
+        }
+
+        /// <summary>
+        /// Performs a normal transformation using the given <see cref="SharpDX.Matrix"/>.
+        /// </summary>
+        /// <param name="normal">The normal vector to transform.</param>
+        /// <param name="transform">The transformation <see cref="SharpDX.Matrix"/>.</param>
+        /// <param name="result">When the method completes, contains the transformed normal.</param>
+        /// <remarks>
+        /// A normal transform performs the transformation with the assumption that the w component
+        /// is zero. This causes the fourth row and fourth column of the matrix to be unused. The
+        /// end result is a vector that is not translated, but all other transformation properties
+        /// apply. This is often preferred for normal vectors as normals purely represent direction
+        /// rather than location because normal vectors should not be translated.
+        /// </remarks>
+        public static void TransformNormal(ref Vector3D normal, ref MatrixD transform, out Vector3D result)
+        {
+            result = new Vector3D(
+                (normal.X * transform.M11) + (normal.Y * transform.M21) + (normal.Z * transform.M31),
+                (normal.X * transform.M12) + (normal.Y * transform.M22) + (normal.Z * transform.M32),
+                (normal.X * transform.M13) + (normal.Y * transform.M23) + (normal.Z * transform.M33));
+        }
+
+        /// <summary>
+        /// Performs a normal transformation using the given <see cref="SharpDX.Matrix"/>.
+        /// </summary>
+        /// <param name="normal">The normal vector to transform.</param>
+        /// <param name="transform">The transformation <see cref="SharpDX.Matrix"/>.</param>
+        /// <returns>The transformed normal.</returns>
+        /// <remarks>
+        /// A normal transform performs the transformation with the assumption that the w component
+        /// is zero. This causes the fourth row and fourth column of the matrix to be unused. The
+        /// end result is a vector that is not translated, but all other transformation properties
+        /// apply. This is often preferred for normal vectors as normals purely represent direction
+        /// rather than location because normal vectors should not be translated.
+        /// </remarks>
+        public static Vector3D TransformNormal(Vector3D normal, MatrixD transform)
+        {
+            Vector3D result;
+            TransformNormal(ref normal, ref transform, out result);
+            return result;
+        }
+
+        /// <summary>
+        /// Performs a normal transformation on an array of vectors using the given <see cref="SharpDX.Matrix"/>.
+        /// </summary>
+        /// <param name="source">The array of normal vectors to transform.</param>
+        /// <param name="transform">The transformation <see cref="SharpDX.Matrix"/>.</param>
+        /// <param name="destination">The array for which the transformed vectors are stored.
+        /// This array may be the same array as <paramref name="source"/>.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="source"/> or <paramref name="destination"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="destination"/> is shorter in length than <paramref name="source"/>.</exception>
+        /// <remarks>
+        /// A normal transform performs the transformation with the assumption that the w component
+        /// is zero. This causes the fourth row and fourth column of the matrix to be unused. The
+        /// end result is a vector that is not translated, but all other transformation properties
+        /// apply. This is often preferred for normal vectors as normals purely represent direction
+        /// rather than location because normal vectors should not be translated.
+        /// </remarks>
+        public static void TransformNormal(Vector3D[] source, ref MatrixD transform, Vector3D[] destination)
+        {
+            if (source == null)
+                throw new ArgumentNullException("source");
+            if (destination == null)
+                throw new ArgumentNullException("destination");
+            if (destination.Length < source.Length)
+                throw new ArgumentOutOfRangeException("destination", "The destination array must be of same length or larger length than the source array.");
+
+            for (int i = 0; i < source.Length; ++i)
+            {
+                TransformNormal(ref source[i], ref transform, out destination[i]);
+            }
         }
     }
 }

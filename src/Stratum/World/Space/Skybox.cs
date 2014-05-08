@@ -70,10 +70,10 @@ namespace Stratum
             Matrix specialProj = Matrix.PerspectiveFovLH(MathUtil.PiOverFour, context.AspectRatio, 0.1f, 2f);
 
             skyboxEffect.Parameters["World"].SetValue(Matrix.Identity);
-            skyboxEffect.Parameters["View"].SetValue(context.CurrentCamera.View);
-            Matrix viewNoT = context.CurrentCamera.View;
-            viewNoT.TranslationVector = Vector3.Zero;
-            skyboxEffect.Parameters["ViewNoT"].SetValue(viewNoT);
+            skyboxEffect.Parameters["View"].SetValue(context.CurrentCamera.ViewD.ToMatrix());
+            
+
+            skyboxEffect.Parameters["ViewNoT"].SetValue(context.RenderContext.ViewNoTrans);
             skyboxEffect.Parameters["Proj"].SetValue(specialProj);
             skyboxEffect.Parameters["skyboxTex"].SetResource(skyboxTex);
             skyboxEffect.Parameters["skyboxSampler"].SetResource(context.Device.SamplerStates.LinearClamp);

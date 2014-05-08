@@ -37,15 +37,18 @@ namespace Stratum.Graphics
 
             CameraFrustum.sbf = gc.CurrentCamera.Frustum;
 
-            View = gc.CurrentCamera.View;
-            Proj = gc.CurrentCamera.Proj;
-            ViewD = new MatrixD(View);
-            ProjD = new MatrixD(Proj);
+            ViewD = gc.CurrentCamera.ViewD;
+            ProjD = gc.CurrentCamera.ProjD;
+            View = ViewD.ToMatrix();
+            Proj = ProjD.ToMatrix();
 
             var viewCopy = View;
             viewCopy.TranslationVector = Vector3.Zero;
             ViewNoTrans = viewCopy;
-            ViewNoTransD = new MatrixD(ViewNoTrans);
+
+            var viewDCopy = ViewD;
+            viewDCopy.TranslationVector = Vector3D.Zero;
+            ViewNoTransD = viewDCopy;
 
             ViewProj = Matrix.Multiply(View, Proj);
             ViewProjD = MatrixD.Multiply(ViewD, ProjD);

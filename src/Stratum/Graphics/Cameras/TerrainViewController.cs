@@ -157,7 +157,7 @@ namespace Stratum
             MatrixD clip = MatrixD.OrthoOffCenterRH(viewport.Y, viewport.X, viewport.W, viewport.Z, 1.0f, -1.0f);
             MatrixD cameraToScreen = MatrixD.PerspectiveFovRH(vfov, width / height, znear, zfar);
 
-            graphicsContext.CurrentCamera.Proj = (clip * cameraToScreen).ToMatrix();
+            graphicsContext.CurrentCamera.ProjD = (clip * cameraToScreen);
         }
     }
 }

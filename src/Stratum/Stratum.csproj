@@ -120,6 +120,8 @@
     <Compile Include="Content\IContentManager.cs" />
     <Compile Include="Engine.cs" />
     <Compile Include="GameLoop.cs" />
+    <Compile Include="Math\QuaternionD.cs" />
+    <Compile Include="Math\Vector2D.cs" />
     <Compile Include="Object\GameObject.cs" />
     <Compile Include="Graphics\Cameras\Camera.cs" />
     <Compile Include="Graphics\Cameras\PlanetCamera.cs" />

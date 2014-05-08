@@ -125,9 +125,9 @@ namespace Stratum.Graphics
             Vector3[] frustumCornersWS = new Vector3[8];
             Vector4[] frustumCornersVS = new Vector4[8];
             Vector4[] farFrustumCornersVS = new Vector4[4];
-            Matrix view = camera.View;
-            Matrix viewProj = Matrix.Multiply(camera.View, camera.Proj);
-            BoundingFrustum frustum = new BoundingFrustum(viewProj);
+            Matrix view = camera.ViewD.ToMatrix();
+            MatrixD viewProj = MatrixD.Multiply(camera.ViewD, camera.ProjD);
+            BoundingFrustum frustum = new BoundingFrustum(viewProj.ToMatrix());
             frustum.GetCorners(frustumCornersWS);
 
             // TODO: take out the translation part of the view matrix
@@ -150,12 +150,10 @@ namespace Stratum.Graphics
         public void SetShaderParameters(SceneNode node)
         {
             gbufferEffect.Parameters["World"].SetValue(node.World.ToMatrix());
-            gbufferEffect.Parameters["View"].SetValue(context.CurrentCamera.View);
-            gbufferEffect.Parameters["Proj"].SetValue(context.CurrentCamera.Proj);
+            gbufferEffect.Parameters["View"].SetValue(context.RenderContext.View);
+            gbufferEffect.Parameters["Proj"].SetValue(context.RenderContext.Proj);
 
-            Matrix viewNoTrans = context.CurrentCamera.View;
-            viewNoTrans.TranslationVector = Vector3.Zero;
-            gbufferEffect.Parameters["ViewNoT"].SetValue(viewNoTrans);
+            gbufferEffect.Parameters["ViewNoT"].SetValue(context.RenderContext.ViewNoTrans);
 
             // other stuff later
         }

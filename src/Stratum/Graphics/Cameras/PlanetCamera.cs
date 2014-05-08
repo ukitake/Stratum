@@ -68,15 +68,15 @@ namespace Stratum
             look.Normalize();
             Vector3D up = N;
 
-            var pitchMat = Quaternion.RotationAxis(right.ToVector3(), Pitch);
-            var yawMat = Quaternion.RotationAxis(up.ToVector3(), Yaw);
-            var yawPitchMat = Quaternion.Multiply(yawMat, pitchMat);
+            var pitchMat = QuaternionD.RotationAxis(right, Pitch);
+            var yawMat = QuaternionD.RotationAxis(up, Yaw);
+            var yawPitchMat = QuaternionD.Multiply(yawMat, pitchMat);
 
             Vector3D rotLook = Vector3D.Transform(look, yawPitchMat);
             Vector3D rotUp = Vector3D.Transform(up, yawPitchMat);
 
             var view = MatrixD.LookAtLH(pos, pos + rotLook, rotUp);
-            View = view.ToMatrix();
+            ViewD = view;
             var graphicsContext = Engine.GraphicsContext;
             ViewportF vp;
             vp = graphicsContext.Device.Viewport;
@@ -118,7 +118,7 @@ namespace Stratum
             //MatrixD clip = MatrixD.OrthoOffCenterRH(viewport.Y, viewport.X, viewport.W, viewport.Z, 1.0f, -1.0f);
             MatrixD cameraToScreen = MatrixD.PerspectiveFovLH(MathUtil.PiOverFour, width / height, znear, zfar);
 
-            Proj = cameraToScreen.ToMatrix();
+            ProjD = cameraToScreen;
             Frustum = new BoundingFrustum((view * cameraToScreen).ToMatrix());
             NearPlane = znear;
             FarPlane = zfar;
@@ -198,7 +198,7 @@ namespace Stratum
             }
         }
 
-        public void Rotate(float headingRadians, float pitchRadians)
+        public void Rotate(double headingRadians, double pitchRadians)
         {
             Pitch += pitchRadians;
 

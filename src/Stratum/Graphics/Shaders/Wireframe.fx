@@ -1,12 +1,12 @@
 struct VS_IN_TERRAIN
 {
-	float3 pos : POSITION;
+	float4 pos : POSITION;
 	float2 tex : TEXCOORD0;
 };
 
 struct VS_OUT_TERRAIN
 {
-	float3 pos : POSITION;
+	float4 pos : POSITION;
 	float2 tex : TEXCOORD0;
 };
 
@@ -85,27 +85,29 @@ VS_OUT_TERRAIN HS_TERRAIN(InputPatch<VS_OUT_TERRAIN, 4> inputPatch, uint pointId
 PS_IN_TERRAIN DS_TERRAIN(HS_CONSTANT_TERRAIN input, float2 uvCoord : SV_DomainLocation, const OutputPatch<VS_OUT_TERRAIN, 4> patch)
 {
 	PS_IN_TERRAIN output;
-	float3 topMidpoint = lerp(patch[0].pos, patch[1].pos, uvCoord.x);
-	float3 bottomMidpoint = lerp(patch[3].pos, patch[2].pos, uvCoord.x);
-	float3 vertexPosition = lerp(topMidpoint, bottomMidpoint, uvCoord.y);
+	float4 topMidpoint = lerp(patch[0].pos, patch[1].pos, uvCoord.x);
+	float4 bottomMidpoint = lerp(patch[3].pos, patch[2].pos, uvCoord.x);
+	float4 vertexPosition = lerp(topMidpoint, bottomMidpoint, uvCoord.y);
 
 	float2 topTex = lerp(patch[0].tex.xy, patch[1].tex.xy, uvCoord.x);
 	float2 botTex = lerp(patch[3].tex.xy, patch[2].tex.xy, uvCoord.x);
 	float2 texCoord = lerp(topTex, botTex, uvCoord.y);
-	float lat = vertexPosition.y;
-	float lon = vertexPosition.x;
+	//float lat = vertexPosition.y;
+	//float lon = vertexPosition.x;
 	
 	// lat long to cartesian
-	float3 ret;
-    ret.x = cos(lat) * cos(lon);
-	ret.y = sin(lat);
-	ret.z = cos(lat) * sin(lon);
-	ret *= 6360.0;
+	//float3 ret;
+    //ret.x = cos(lat) * cos(lon);
+	//ret.y = sin(lat);
+	//ret.z = cos(lat) * sin(lon);
+	//ret *= 6360.0;
 
-	float3 wpos = mul(float4(ret, 1.0), World).xyz;
-	output.wpos = wpos;
-	output.vpos = (float3)mul(float4(wpos, 1.0), View).xyz;
-	output.pos = mul(float4(output.vpos, 1.0), Proj);
+	//float3 wpos = mul(float4(vertexPosition, 1.0), World).xyz;
+	//output.wpos = wpos;
+	//output.vpos = (float3)mul(float4(wpos, 1.0), View).xyz;
+	//output.vpos = vertexPosition;
+	//output.pos = mul(float4(output.vpos, 1.0), Proj);
+	output.pos = vertexPosition;
 	output.tex = texCoord;
 	return output;
 }

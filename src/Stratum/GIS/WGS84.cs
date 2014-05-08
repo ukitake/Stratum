@@ -16,9 +16,9 @@ namespace Stratum.GIS
             double lat = MathUtilD.DegreesToRadians(latitude);
             double lon = MathUtilD.DegreesToRadians(longitude);
 
-            ret.X = EarthRadius * Math.Cos(lat) * Math.Cos(lon);
-            ret.Y = EarthRadius * Math.Sin(lat);
-            ret.Z = EarthRadius * Math.Cos(lat) * Math.Sin(lon);
+            ret.X = EarthRadius * System.Math.Cos(lat) * System.Math.Cos(lon);
+            ret.Y = EarthRadius * System.Math.Sin(lat);
+            ret.Z = EarthRadius * System.Math.Cos(lat) * System.Math.Sin(lon);
 
             return ret;
         }

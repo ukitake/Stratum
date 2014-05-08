@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SharpDX;
-
-using Math = System.Math;
 using Stratum.GIS;
 
 namespace Stratum.WorldEngine
 {
+    using Math = System.Math;
+
     public class SunCalculator
     {
-        const double rad = Math.PI / 180D;
+        const double rad = System.Math.PI / 180D;
         const double dayMs = 1000 * 50 * 60 * 24;
         const double J1970 = 2440588;
         const double J2000 = 2451545;

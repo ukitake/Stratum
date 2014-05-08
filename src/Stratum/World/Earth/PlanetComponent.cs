@@ -74,7 +74,7 @@ namespace Stratum.World.Earth
                 0,
                 resources,
                 this.Object.World.ToMatrix(),
-                Engine.GraphicsContext.Device.BlendStates.Opaque);
+                Engine.GraphicsContext.Device.BlendStates.Opaque, rasterizer: Engine.GraphicsContext.Device.RasterizerStates.CullBack);
         }
 
         public override void QueueRenderCommands(GameTime gameTime, Renderer renderer, IGraphicsContext context)
@@ -95,7 +95,7 @@ namespace Stratum.World.Earth
             int nodeCount = nodesToRender.Count;
             if (nodeCount > 0)
             {
-                TerrainVertex[] vertices = nodesToRender.SelectMany(node => nodeToGeometry(node)).ToArray();
+                TerrainVertex[] vertices = nodesToRender.SelectMany(node => node.Geometry).ToArray();
 
                 var command = GenerateRenderCommand();
                 (command as RenderCommand<TerrainVertex>).NumVertices = vertices.Length;
@@ -133,16 +133,16 @@ namespace Stratum.World.Earth
             }
         }
 
-        private TerrainVertex[] nodeToGeometry(TerrainNode node)
-        {
-            return new TerrainVertex[4] 
-            {
-                new TerrainVertex(new Vector3((float)MathUtilD.DegreesToRadians(node.TL.Longitude), (float)MathUtilD.DegreesToRadians(node.TL.Latitude), 0f), new Vector2(0f, 0f)),
-                new TerrainVertex(new Vector3((float)MathUtilD.DegreesToRadians(node.TR.Longitude), (float)MathUtilD.DegreesToRadians(node.TR.Latitude), 0f), new Vector2(1f, 0f)),
-                new TerrainVertex(new Vector3((float)MathUtilD.DegreesToRadians(node.BR.Longitude), (float)MathUtilD.DegreesToRadians(node.BR.Latitude), 0f), new Vector2(1f, 1f)),
-                new TerrainVertex(new Vector3((float)MathUtilD.DegreesToRadians(node.BL.Longitude), (float)MathUtilD.DegreesToRadians(node.BL.Latitude), 0f), new Vector2(0f, 1f))
-            };
-        }
+        //private TerrainVertex[] nodeToGeometry(TerrainNode node)
+        //{
+        //    return new TerrainVertex[4] 
+        //    {
+        //        new TerrainVertex(new Vector3((float)MathUtilD.DegreesToRadians(node.TL.Longitude), (float)MathUtilD.DegreesToRadians(node.TL.Latitude), 0f), new Vector2(0f, 0f)),
+        //        new TerrainVertex(new Vector3((float)MathUtilD.DegreesToRadians(node.TR.Longitude), (float)MathUtilD.DegreesToRadians(node.TR.Latitude), 0f), new Vector2(1f, 0f)),
+        //        new TerrainVertex(new Vector3((float)MathUtilD.DegreesToRadians(node.BR.Longitude), (float)MathUtilD.DegreesToRadians(node.BR.Latitude), 0f), new Vector2(1f, 1f)),
+        //        new TerrainVertex(new Vector3((float)MathUtilD.DegreesToRadians(node.BL.Longitude), (float)MathUtilD.DegreesToRadians(node.BL.Latitude), 0f), new Vector2(0f, 1f))
+        //    };
+        //}
 
         private int[] getIndices(int nodeIndex)
         {

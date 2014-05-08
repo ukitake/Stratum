@@ -10,17 +10,17 @@ using System.Threading.Tasks;
 namespace Stratum.World.Earth
 {
     /// <summary>
-    /// TerrainNodes should have a 1 to 1 relationship with Terrain Tiles, but do not necessarily have to have a 1 to 1 with Imagery Tiles
+    /// A node in a Terrain Quadtree
     /// </summary>
     public class TerrainNode
     {
-        public static readonly int maxSplit = 19;
+        public static readonly int maxSplit = 22;
         public static readonly double splitFactor = 1.2; // must be greater than 1 for a restricted quadtree
 
         protected int splitDepth;
         protected TerrainNode[] children;
 
-        protected TerrainVertex[] vertices;
+        //protected TerrainVertex[] vertices;
 
         protected LatLon[] corners;
         protected LatLon center;
@@ -109,16 +109,16 @@ namespace Stratum.World.Earth
         {
             get
             {
-                if (vertices == null)
-                {
-                    vertices = new TerrainVertex[4] 
-                    {
-                        new TerrainVertex(new Vector3((float)MathUtilD.DegreesToRadians(this.TL.Longitude), (float)MathUtilD.DegreesToRadians(this.TL.Latitude), 0f), new Vector2(0f, 0f)),
-                        new TerrainVertex(new Vector3((float)MathUtilD.DegreesToRadians(this.TR.Longitude), (float)MathUtilD.DegreesToRadians(this.TR.Latitude), 0f), new Vector2(1f, 0f)),
-                        new TerrainVertex(new Vector3((float)MathUtilD.DegreesToRadians(this.BR.Longitude), (float)MathUtilD.DegreesToRadians(this.BR.Latitude), 0f), new Vector2(1f, 1f)),
-                        new TerrainVertex(new Vector3((float)MathUtilD.DegreesToRadians(this.BL.Longitude), (float)MathUtilD.DegreesToRadians(this.BL.Latitude), 0f), new Vector2(0f, 1f))
-                    };
-                }
+                var rc = Engine.GraphicsContext.RenderContext;
+                var vertices = new TerrainVertex[4];
+
+                var corners = transformCorners();
+                var viewCorners = corners.Select(c => Vector3D.Transform(c, rc.ViewProjD)).ToArray();
+
+                vertices[0] = new TerrainVertex(viewCorners[0], new Vector2(0, 1));
+                vertices[1] = new TerrainVertex(viewCorners[1], new Vector2(0, 0));
+                vertices[2] = new TerrainVertex(viewCorners[2], new Vector2(1, 0));
+                vertices[3] = new TerrainVertex(viewCorners[3], new Vector2(1, 1));
 
                 return vertices;
             }

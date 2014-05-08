@@ -26,12 +26,12 @@ namespace Stratum
             FieldOfView = fov;
             AspectRatio = aspectRatio;
 
-            XSensitivity = 0.001f;
-            Up = Vector3.Up;
-            Right = Vector3.Right;
+            XSensitivity = 0.001;
+            Up = Vector3D.UnitY;
+            Right = Vector3D.UnitX;
 
-            Matrix orient = Matrix.Identity;
-            orient.Forward = -Vector3.UnitZ;
+            MatrixD orient = MatrixD.Identity;
+            orient.Forward = -Vector3D.UnitZ;
             orient.Right = this.Right;
             orient.Up = this.Up;
         }
@@ -46,27 +46,27 @@ namespace Stratum
         IGraphicsContext context;
 
         /// <summary>
-        /// Default value is 0.001f
+        /// Default value is 0.001
         /// </summary>
-        public float XSensitivity { get; set; }
+        public double XSensitivity { get; set; }
 
         public Vector3 Position { get; set; }
         public Vector3D PositionD { get; set; }
-        public Vector3 LookAt { get; set; }
-        public Vector3 Up { get; set; }
-        public Vector3 Right { get; set; }
+        public Vector3D LookAt { get; set; }
+        public Vector3D Up { get; set; }
+        public Vector3D Right { get; set; }
 
-        public float Yaw { get; set; }
-        public float Pitch { get; set; }
-        public float Roll { get; set; }
+        public double Yaw { get; set; }
+        public double Pitch { get; set; }
+        public double Roll { get; set; }
 
-        public float NearPlane { get; set; }
-        public float FarPlane { get; set; }
-        public float FieldOfView { get; set; }
-        public float AspectRatio { get; set; }
+        public double NearPlane { get; set; }
+        public double FarPlane { get; set; }
+        public double FieldOfView { get; set; }
+        public double AspectRatio { get; set; }
 
-        public Matrix View { get; set; }
-        public Matrix Proj { get; set; }
+        public MatrixD ViewD { get; set; }
+        public MatrixD ProjD { get; set; }
 
         public BoundingFrustum Frustum { get; set; }
 
@@ -88,9 +88,9 @@ namespace Stratum
             NearPlane = 1;
             FarPlane = 12000;
 
-            View = Matrix.LookAtLH(Position, Position + LookAt, Up);
-            Proj = Matrix.PerspectiveFovLH(FieldOfView, context.AspectRatio, NearPlane, FarPlane);
-            Frustum = new BoundingFrustum(View * Proj);
+            ViewD = MatrixD.LookAtLH(PositionD, PositionD + LookAt, Up);
+            ProjD = MatrixD.PerspectiveFovLH(FieldOfView, context.AspectRatio, NearPlane, FarPlane);
+            Frustum = new BoundingFrustum(ViewD.ToMatrix() * ProjD.ToMatrix()); // loss of precision
         }
 
         protected virtual void HandleInput(GameTime gameTime)
@@ -108,10 +108,10 @@ namespace Stratum
             this.Pitch -= dt * orientationDelta.Y * XSensitivity * 2f;
             this.Yaw += dt * orientationDelta.X * XSensitivity * 2f;
             
-            Matrix rot = Matrix.RotationYawPitchRoll(this.Yaw, this.Pitch, this.Roll);
-            this.LookAt = Vector3.TransformCoordinate(Vector3.ForwardRH, rot);
-            this.Right = Vector3.TransformCoordinate(Vector3.Right, rot);
-            this.Up = Vector3.Cross(this.Right, this.LookAt);
+            MatrixD rot = MatrixD.RotationYawPitchRoll(this.Yaw, this.Pitch, this.Roll);
+            this.LookAt = Vector3D.TransformCoordinate(Vector3D.UnitZ, rot);
+            this.Right = Vector3D.TransformCoordinate(Vector3D.UnitX, rot);
+            this.Up = Vector3D.Cross(this.Right, this.LookAt);
 
             this.LookAt.Normalize();
             this.Right.Normalize();
@@ -121,8 +121,8 @@ namespace Stratum
 
             float rtrigger = currentStates.Gamepad.RTrigger() == 0 ? 1f : currentStates.Gamepad.RTrigger();
 
-            Vector3D force = new Vector3D(this.LookAt) * l.Y * 20.0; // thrust
-            force -= new Vector3D(this.Right) * l.X * 20.0;
+            Vector3D force = this.LookAt * l.Y * 20.0; // thrust
+            force -= this.Right * l.X * 20.0;
 
             force *= dt * 0.1f * rtrigger;
 

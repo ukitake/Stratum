@@ -276,10 +276,10 @@ namespace Stratum.WorldEngine
             Vector3[] frustumCornersWS = new Vector3[8];
             Vector3[] farFrustumCornersWS = new Vector3[4];
             Vector4[] farFrustumCornersVS = new Vector4[4];
-            Matrix view = camera.View;
+            Matrix view = camera.ViewD.ToMatrix();
 
-            Matrix viewProj = Matrix.Multiply(camera.View, camera.Proj);
-            BoundingFrustum frustum = new BoundingFrustum(viewProj);
+            MatrixD viewProj = MatrixD.Multiply(camera.ViewD, camera.ProjD);
+            BoundingFrustum frustum = new BoundingFrustum(viewProj.ToMatrix());
             frustum.GetCorners(frustumCornersWS);
 
             //  2 ____________  1
