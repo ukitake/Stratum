@@ -73,21 +73,21 @@ namespace Stratum.Graphics.RenderCommands
 
             // Dev Note: enforcing convention here... Effects set on the RenderCommand must
             // have constant buffer parameters with these names and types
-            //Effect.Parameters["World"].SetValue(World);
-            //Effect.Parameters["View"].SetValue(rContext.View);
-            //Effect.Parameters["ViewNoT"].SetValue(rContext.ViewNoTrans);
-            //Effect.Parameters["Proj"].SetValue(rContext.Proj);
-            //Effect.Parameters["ViewProj"].SetValue(rContext.ViewProj);
+            Effect.Parameters["World"].SetValue(World);
+            Effect.Parameters["View"].SetValue(rContext.View);
+            Effect.Parameters["ViewNoT"].SetValue(rContext.ViewNoTrans);
+            Effect.Parameters["Proj"].SetValue(rContext.Proj);
+            Effect.Parameters["ViewProj"].SetValue(rContext.ViewProj);
 
             var camPos = context.CurrentCamera.PositionD;
             Vector3 low, high;
             camPos.Split(out low, out high);
 
-            //Effect.Parameters["GlobalTime"].SetValue((float)rContext.Time.TotalGameTime.TotalSeconds); // todo: needs double precision
-            //Effect.Parameters["CameraPosition"].SetValue(context.CurrentCamera.Position);
-            //Effect.Parameters["CameraPositionLow"].SetValue(low);
-            //Effect.Parameters["CameraPositionHigh"].SetValue(high);
-            //Effect.Parameters["ViewportSize"].SetValue(new Vector2(device.Viewport.Width, device.Viewport.Height));
+            Effect.Parameters["GlobalTime"].SetValue((float)rContext.Time.TotalGameTime.TotalSeconds); // todo: needs double precision
+            Effect.Parameters["CameraPosition"].SetValue(context.CurrentCamera.Position);
+            Effect.Parameters["CameraPositionLow"].SetValue(low);
+            Effect.Parameters["CameraPositionHigh"].SetValue(high);
+            Effect.Parameters["ViewportSize"].SetValue(new Vector2(device.Viewport.Width, device.Viewport.Height));
         }
 
         protected virtual void ApplyEffect()

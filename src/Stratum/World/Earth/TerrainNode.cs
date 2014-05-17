@@ -14,7 +14,7 @@ namespace Stratum.World.Earth
     /// </summary>
     public class TerrainNode
     {
-        public static readonly int maxSplit = 22;
+        public static readonly int maxSplit = 19;
         public static readonly double splitFactor = 1.2; // must be greater than 1 for a restricted quadtree
 
         protected int splitDepth;
@@ -112,13 +112,23 @@ namespace Stratum.World.Earth
                 var rc = Engine.GraphicsContext.RenderContext;
                 var vertices = new TerrainVertex[4];
 
-                var corners = transformCorners();
-                var viewCorners = corners.Select(c => Vector3D.Transform(c, rc.ViewProjD)).ToArray();
+                Vector3D[] _corners;
+                if (splitDepth < 16)
+                {
+                    // don't have to worry about precision, so tessellate in lat/lon space
+                    _corners = corners.Select(c => 
+                        new Vector3D(MathUtilD.DegreesToRadians(c.Longitude), MathUtilD.DegreesToRadians(c.Latitude), 0.0)).ToArray();
+                }
+                else
+                {
+                    // precision is a problem at this zoom level, so tessellate in world space 
+                    _corners = corners.Select(c => Vector3D.TransformCoordinate(RenderWGS84.ToWorld(c.Latitude, c.Longitude), rc.ViewD)).ToArray();
+                }
 
-                vertices[0] = new TerrainVertex(viewCorners[0], new Vector2(0, 1));
-                vertices[1] = new TerrainVertex(viewCorners[1], new Vector2(0, 0));
-                vertices[2] = new TerrainVertex(viewCorners[2], new Vector2(1, 0));
-                vertices[3] = new TerrainVertex(viewCorners[3], new Vector2(1, 1));
+                vertices[0] = new TerrainVertex(_corners[0], new Vector2(0, 1), splitDepth);
+                vertices[1] = new TerrainVertex(_corners[1], new Vector2(0, 0), splitDepth);
+                vertices[2] = new TerrainVertex(_corners[2], new Vector2(1, 0), splitDepth);
+                vertices[3] = new TerrainVertex(_corners[3], new Vector2(1, 1), splitDepth);
 
                 return vertices;
             }

@@ -154,7 +154,8 @@ namespace Stratum
             renderer = new Stratum.Renderer();
 
             var earth = CreateGameObject();
-            earth.AddComponent(new PlanetComponent());
+            var planetComp = CreateComponent<PlanetComponent>();
+            earth.AddComponent(planetComp);
             SceneGraph.Insert(earth, null);
 
             Engine.GraphicsContext.CurrentCamera = new PlanetCamera(RenderWGS84.EarthRadius);
@@ -178,7 +179,8 @@ namespace Stratum
             renderer = new Stratum.Renderer();
 
             var earth = CreateGameObject();
-            earth.AddComponent(new PlanetComponent());
+            var planetComp = CreateComponent<PlanetComponent>();
+            earth.AddComponent(planetComp);
             SceneGraph.Insert(earth, null);
 
             Engine.GraphicsContext.CurrentCamera = new PlanetCamera(RenderWGS84.EarthRadius);

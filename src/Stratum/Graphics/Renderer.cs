@@ -8,6 +8,7 @@ using SharpDX.Toolkit;
 using SharpDX.Toolkit.Graphics;
 using Stratum.Graphics;
 using Stratum.Graphics.RenderCommands;
+using Stratum.World.Earth;
 
 namespace Stratum
 {
@@ -150,6 +151,7 @@ namespace Stratum
             context.SpriteBatch.DrawString(font, string.Format("camera Y: {0}", context.CurrentCamera.Position.Y), new Vector2(0, 30), Color.White);
             context.SpriteBatch.DrawString(font, string.Format("camera Z: {0}", context.CurrentCamera.Position.Z), new Vector2(0, 45), Color.White);
             context.SpriteBatch.DrawString(font, string.Format("Camera Height: {0}", context.CurrentCamera.Position.Length()), new Vector2(0, 60), Color.White);
+            context.SpriteBatch.DrawString(font, string.Format("Num Terrain Triangles: {0}", Engine.GetComponent<PlanetComponent>(2).NodeCount * 64 * 64 * 2), new Vector2(0, 75), Color.White);
             context.SpriteBatch.End();
         }
 

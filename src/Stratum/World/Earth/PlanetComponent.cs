@@ -25,14 +25,16 @@ namespace Stratum.World.Earth
         {
             Initialize();
 
-            rootNodes = new CesiumTerrainNode[2];
-            rootNodes[0] = new CesiumTerrainNode(null, Quadrant.BL, new GIS.LatLon(-90.0, -180.0), new GIS.LatLon(90.0, 0.0));
-            rootNodes[1] = new CesiumTerrainNode(null, Quadrant.BL, new GIS.LatLon(-90.0, 0.0), new GIS.LatLon(90.0, 180.0));
+            rootNodes = new HemisphereTerrainNode[2];
+            rootNodes[0] = new HemisphereTerrainNode(null, Quadrant.BL, new GIS.LatLon(-90.0, -180.0), new GIS.LatLon(90.0, 0.0));
+            rootNodes[1] = new HemisphereTerrainNode(null, Quadrant.BL, new GIS.LatLon(-90.0, 0.0), new GIS.LatLon(90.0, 180.0));
 
             resources = new Dictionary<string, GraphicsResource>();
         }
 
         private Effect wireFrame;
+
+        public int NodeCount { get; private set; }
 
         public virtual void Initialize()
         {
@@ -93,6 +95,7 @@ namespace Stratum.World.Earth
             }
 
             int nodeCount = nodesToRender.Count;
+            NodeCount = nodeCount;
             if (nodeCount > 0)
             {
                 TerrainVertex[] vertices = nodesToRender.SelectMany(node => node.Geometry).ToArray();

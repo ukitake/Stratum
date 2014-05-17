@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace Stratum.World.Earth
 {
-    public class CesiumTerrainNode : TerrainNode
+    public class HemisphereTerrainNode : TerrainNode
     {
-        public CesiumTerrainNode(CesiumTerrainNode parent, Quadrant quad, LatLon bl, LatLon tl, LatLon tr, LatLon br)
+        public HemisphereTerrainNode(HemisphereTerrainNode parent, Quadrant quad, LatLon bl, LatLon tl, LatLon tr, LatLon br)
             : base(parent, quad, bl, tl, tr, br)
         {
         }
 
-        public CesiumTerrainNode(CesiumTerrainNode parent, Quadrant quad, LatLon bl, LatLon tr)
+        public HemisphereTerrainNode(HemisphereTerrainNode parent, Quadrant quad, LatLon bl, LatLon tr)
             : base(parent, quad, bl, tr)
         {
 
@@ -32,11 +32,11 @@ namespace Stratum.World.Earth
                     LatLon topMidpoint = LatLon.Average(TL, TR);
                     LatLon bottomMidpoint = LatLon.Average(BL, BR);
 
-                    CesiumTerrainNode bl = new CesiumTerrainNode(this, Quadrant.BL, BL, leftMidpoint, center, bottomMidpoint);
-                    CesiumTerrainNode tl = new CesiumTerrainNode(this, Quadrant.TL, leftMidpoint, TL, topMidpoint, center);
-                    CesiumTerrainNode tr = new CesiumTerrainNode(this, Quadrant.TR, center, topMidpoint, TR, rightMidpoint);
-                    CesiumTerrainNode br = new CesiumTerrainNode(this, Quadrant.BR, bottomMidpoint, center, rightMidpoint, BR);
-                    children = new CesiumTerrainNode[4] 
+                    HemisphereTerrainNode bl = new HemisphereTerrainNode(this, Quadrant.BL, BL, leftMidpoint, center, bottomMidpoint);
+                    HemisphereTerrainNode tl = new HemisphereTerrainNode(this, Quadrant.TL, leftMidpoint, TL, topMidpoint, center);
+                    HemisphereTerrainNode tr = new HemisphereTerrainNode(this, Quadrant.TR, center, topMidpoint, TR, rightMidpoint);
+                    HemisphereTerrainNode br = new HemisphereTerrainNode(this, Quadrant.BR, bottomMidpoint, center, rightMidpoint, BR);
+                    children = new HemisphereTerrainNode[4] 
                     {
                         bl, tl, tr, br
                     };

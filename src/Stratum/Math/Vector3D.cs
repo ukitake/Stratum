@@ -123,14 +123,31 @@ namespace Stratum
             return new Vector3((float)X, (float)Y, (float)Z);
         }
 
+        //public void Split(out Vector3 low, out Vector3 high)
+        //{
+        //    float lowx = split_low(X), highx = split_high(X);
+        //    float lowy = split_low(Y), highy = split_high(Y);
+        //    float lowz = split_low(Z), highz = split_high(Z);
+
+        //    low = new Vector3(lowx, lowy, lowz);
+        //    high = new Vector3(highx, highy, highz);
+        //}
+
         public void Split(out Vector3 low, out Vector3 high)
         {
-            float lowx = split_low(X), highx = split_high(X);
-            float lowy = split_low(Y), highy = split_high(Y);
-            float lowz = split_low(Z), highz = split_high(Z);
+            float lowx, highx, lowy, highy, lowz, highz;
+            ds_split(X, out highx, out lowx);
+            ds_split(Y, out highy, out lowy);
+            ds_split(Z, out highz, out lowz);
 
             low = new Vector3(lowx, lowy, lowz);
             high = new Vector3(highx, highy, highz);
+        }
+
+        private static void ds_split(double d, out float high, out float low)
+        {
+            high = (float)d;
+            low = (float)(d - (double)high);
         }
 
         private static unsafe float split_high(double d)

@@ -11,6 +11,7 @@ namespace Stratum.World.Earth
         BL,
         TL,
         TR,
-        BR
+        BR,
+        Root
     }
 }

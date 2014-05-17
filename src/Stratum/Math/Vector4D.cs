@@ -965,8 +965,36 @@ namespace Stratum
         /// </summary>
         /// <param name="vector">The source vector.</param>
         /// <param name="transform">The transformation <see cref="SharpDX.Matrix"/>.</param>
+        /// <param name="result">When the method completes, contains the transformed <see cref="SharpDX.Vector4D"/>.</param>
+        public static void Transform(ref Vector4D vector, ref MatrixD transform, out Vector4D result)
+        {
+            result = new Vector4D(
+                (vector.X * transform.M11) + (vector.Y * transform.M21) + (vector.Z * transform.M31) + (vector.W * transform.M41),
+                (vector.X * transform.M12) + (vector.Y * transform.M22) + (vector.Z * transform.M32) + (vector.W * transform.M42),
+                (vector.X * transform.M13) + (vector.Y * transform.M23) + (vector.Z * transform.M33) + (vector.W * transform.M43),
+                (vector.X * transform.M14) + (vector.Y * transform.M24) + (vector.Z * transform.M34) + (vector.W * transform.M44));
+        }
+
+        /// <summary>
+        /// Transforms a 4D vector by the given <see cref="SharpDX.Matrix"/>.
+        /// </summary>
+        /// <param name="vector">The source vector.</param>
+        /// <param name="transform">The transformation <see cref="SharpDX.Matrix"/>.</param>
         /// <returns>The transformed <see cref="SharpDX.Vector4D"/>.</returns>
         public static Vector4D Transform(Vector4D vector, Matrix transform)
+        {
+            Vector4D result;
+            Transform(ref vector, ref transform, out result);
+            return result;
+        }
+
+        /// <summary>
+        /// Transforms a 4D vector by the given <see cref="SharpDX.Matrix"/>.
+        /// </summary>
+        /// <param name="vector">The source vector.</param>
+        /// <param name="transform">The transformation <see cref="SharpDX.Matrix"/>.</param>
+        /// <returns>The transformed <see cref="SharpDX.Vector4D"/>.</returns>
+        public static Vector4D Transform(Vector4D vector, MatrixD transform)
         {
             Vector4D result;
             Transform(ref vector, ref transform, out result);

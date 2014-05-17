@@ -188,6 +188,9 @@
     <Content Include="Graphics\Fonts\Arial16.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Graphics\Shaders\Common.fx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Graphics\Shaders\CopyTextureToTarget.fx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
