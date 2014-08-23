@@ -14,6 +14,7 @@ using SharpDX.Toolkit.Graphics;
 using System.Collections.Concurrent;
 using Stratum.World.Earth;
 using Stratum.GIS;
+using Stratum.WorldEngine;
 
 namespace Stratum
 {
@@ -155,7 +156,9 @@ namespace Stratum
 
             var earth = CreateGameObject();
             var planetComp = CreateComponent<PlanetComponent>();
+            var atmosphere = CreateComponent<Atmosphere>();
             earth.AddComponent(planetComp);
+            earth.AddComponent(atmosphere);
             SceneGraph.Insert(earth, null);
 
             Engine.GraphicsContext.CurrentCamera = new PlanetCamera(RenderWGS84.EarthRadius);
@@ -180,7 +183,9 @@ namespace Stratum
 
             var earth = CreateGameObject();
             var planetComp = CreateComponent<PlanetComponent>();
+            var atmosphere = CreateComponent<Atmosphere>();
             earth.AddComponent(planetComp);
+            earth.AddComponent(atmosphere);
             SceneGraph.Insert(earth, null);
 
             Engine.GraphicsContext.CurrentCamera = new PlanetCamera(RenderWGS84.EarthRadius);

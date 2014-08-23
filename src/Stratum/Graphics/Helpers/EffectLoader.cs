@@ -10,10 +10,11 @@ using SharpDX.Toolkit.Graphics;
 namespace Stratum.Graphics
 {
     // todo: Effects should be loaded through the content manager
-    public static class EffectLoader
+    internal static class EffectLoader
     {
         public static Effect Load(string filePathAndName)
         {
+            string extension = Path.GetExtension(filePathAndName);
             string baseDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string fullPath = Path.Combine(baseDir, filePathAndName);
 
@@ -22,17 +23,27 @@ namespace Stratum.Graphics
                 Debugger.Break();
             }
 
-            EffectCompiler compiler = new EffectCompiler();
-            var result = compiler.CompileFromFile(fullPath, EffectCompilerFlags.Debug);
-            
-            if (result.HasErrors)
+            if (extension == ".fx")
             {
-                var thing = result.Logger.Messages;
-                Debugger.Break();
-                return null;
+                EffectCompiler compiler = new EffectCompiler();
+                var result = compiler.CompileFromFile(fullPath, EffectCompilerFlags.Debug);
+
+                if (result.HasErrors)
+                {
+                    var thing = result.Logger.Messages;
+                    Debugger.Break();
+                    return null;
+                }
+                else
+                    return new Effect(Engine.GraphicsContext.Device, result.EffectData);
             }
-            else
-                return new Effect(Engine.GraphicsContext.Device, result.EffectData);
+
+            if (extension == ".fxo")
+            {
+                // todo
+            }
+
+            return null;
         }
     }
 }

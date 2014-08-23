@@ -33,7 +33,7 @@ namespace Stratum.Graphics
             int height = context.Device.BackBuffer.Height;
             DepthTarget = RenderTarget2D.New(context.Device, width, height, PixelFormat.R32.Float);
             NormalTarget = RenderTarget2D.New(context.Device, width, height, PixelFormat.R32G32B32A32.Float);
-            AlbedoTarget = RenderTarget2D.New(context.Device, width, height, PixelFormat.R8G8B8A8.UNormSRgb);
+            AlbedoTarget = RenderTarget2D.New(context.Device, width, height, PixelFormat.R16G16B16A16.UNorm);
         }
 
         IGraphicsContext context;
@@ -49,7 +49,7 @@ namespace Stratum.Graphics
 
         public void Initialize()
         {
-            gbufferEffect = EffectLoader.Load(@"Graphics/Shaders/GBufferUber.fx");
+            gbufferEffect = EffectLoader.Load(@"Graphics/Shaders/GBuffer.fx");
 
             QuadVert[] verts = new QuadVert[6]
             {

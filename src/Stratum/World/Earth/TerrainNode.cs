@@ -113,7 +113,7 @@ namespace Stratum.World.Earth
                 var vertices = new TerrainVertex[4];
 
                 Vector3D[] _corners;
-                if (splitDepth < 16)
+                if (splitDepth < 12)
                 {
                     // don't have to worry about precision, so tessellate in lat/lon space
                     _corners = corners.Select(c => 
@@ -121,7 +121,7 @@ namespace Stratum.World.Earth
                 }
                 else
                 {
-                    // precision is a problem at this zoom level, so tessellate in world space 
+                    // precision is a problem at this zoom level, so tessellate in view space 
                     _corners = corners.Select(c => Vector3D.TransformCoordinate(RenderWGS84.ToWorld(c.Latitude, c.Longitude), rc.ViewD)).ToArray();
                 }
 

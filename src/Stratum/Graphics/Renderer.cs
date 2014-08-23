@@ -6,6 +6,7 @@ using System.Text;
 using SharpDX;
 using SharpDX.Toolkit;
 using SharpDX.Toolkit.Graphics;
+using Stratum.Cesium;
 using Stratum.Graphics;
 using Stratum.Graphics.RenderCommands;
 using Stratum.World.Earth;
@@ -14,15 +15,18 @@ namespace Stratum
 {
     public class Renderer
     {
+        // ignore concurrency for now
         private Queue<IRenderCommand> normalQueue = new Queue<IRenderCommand>();
         private Queue<IRenderDeferredCommand> deferredQueue = new Queue<IRenderDeferredCommand>();
+        private Queue<IRenderCommand> postProcessQueue = new Queue<IRenderCommand>();
+        private Queue<Stratum.Graphics.DirectionalLight> lightQueue = new Queue<Stratum.Graphics.DirectionalLight>();
 
         public Renderer()
         {
             IGraphicsContext context = Engine.GraphicsContext;
             int width = context.Device.BackBuffer.Width;
             int height = context.Device.BackBuffer.Height;
-            sceneTarget = RenderTarget2D.New(context.Device, width, height, MSAALevel.X8, PixelFormat.R8G8B8A8.UNorm);
+            sceneTarget = RenderTarget2D.New(context.Device, width, height, PixelFormat.R8G8B8A8.UNorm);
             texToTargetEffect = EffectLoader.Load(@"Graphics/Shaders/CopyTextureToTarget.fx");
             gbuffer = context.GBuffer;
 
@@ -36,14 +40,28 @@ namespace Stratum
             fpsClock.Start();
         }
 
-        internal void EnqueueNormal(IRenderCommand command)
+        public void EnqueueNormal(IRenderCommand command)
         {
+            if (command is IRenderDeferredCommand)
+                throw new NotSupportedException("Cannot enqueue a deferred render command to the normal queue");
+
             normalQueue.Enqueue(command);
         }
 
-        internal void EnqueueDeferred(IRenderDeferredCommand command)
+        public void EnqueueDeferred(IRenderDeferredCommand command)
         {
             deferredQueue.Enqueue(command);
+        }
+
+        public void EnqueuePostProcess(IRenderCommand command)
+        {
+            // todo: post process might need its own kind of command?
+            postProcessQueue.Enqueue(command);
+        }
+
+        public void EnqueueLight(Stratum.Graphics.DirectionalLight light)
+        {
+            lightQueue.Enqueue(light);
         }
 
         public void Render(GameTime gameTime, IGraphicsContext context)
@@ -54,8 +72,10 @@ namespace Stratum
             // clear render queues
             normalQueue.Clear();
             deferredQueue.Clear();
+            postProcessQueue.Clear();
+            lightQueue.Clear();
 
-            // HACK: update current camera
+            // HACK: update current camera... camera probably needs to be a GameObject
             context.CurrentCamera.Update(gameTime);
 
             // Depth First Traversal of Scene Graph to queue render commands
@@ -77,7 +97,12 @@ namespace Stratum
             device.Clear(sceneTarget, Color.Black);
             device.SetRenderTargets(sceneTarget);
             
-            // todo: render lights here
+            // render all the lights to shade deferred objects
+            while (lightQueue.Count > 0)
+            {
+                var light = lightQueue.Dequeue();
+                gbuffer.RenderDirectionalLight(light);
+            }
         
             // render normal queue to scene target
             // note that we're carrying over depth info from the deferred queue
@@ -88,11 +113,18 @@ namespace Stratum
                 ProcessRenderCommand(command, context);
             }
 
-            // resolve scene target to back buffer
-            device.Copy((GraphicsResource)sceneTarget, 0, (GraphicsResource)device.BackBuffer, 0, SharpDX.DXGI.Format.R8G8B8A8_UNorm);
-            device.SetRenderTargets(device.BackBuffer);
-            //CopyTextureToRenderTarget(device, sceneTarget, device.BackBuffer);
+            // apply post processes that need to run on the MSAA render target
+            // before it is resolved into the backbuffer
+            while (postProcessQueue.Count > 0)
+            {
+                var command = postProcessQueue.Dequeue();
+                ProcessRenderCommand(command, context);
+            }
 
+            // resolve MSAA scene target to back buffer
+            device.Copy((GraphicsResource)sceneTarget, 0, (GraphicsResource)device.BackBuffer, 0, SharpDX.DXGI.Format.R8G8B8A8_UNorm);
+
+            device.SetRenderTargets(device.BackBuffer);
             RenderDiagnostics(context);
 
             // Present

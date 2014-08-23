@@ -1,4 +1,7 @@
 #include "Common.fx"
+#include "../../../Graphics/Shaders/Common.fx"
+#include "../../../Graphics/Shaders/GBufferCommon.fx";
+#include "../../../Graphics/Shaders/dsfun90.fx"
 
 static const float EPSILON_ATMOSPHERE = 0.002;
 static const float EPSILON_INSCATTER = 0.004;
@@ -17,17 +20,6 @@ struct VS_OUT
 	float3 farfrustumCornerViewSpace : TEXCOORD1; // view space translation, but rotated to world space
 };
 
-// textures for reading from gbuffer
-
-Texture2D gbDepthTexture;
-SamplerState gbDepthSampler;
-
-Texture2D gbNormalTexture;
-SamplerState gbNormalSampler;
-
-Texture2D gbAlbedoTexture;
-SamplerState gbAlbedoSampler;
-
 Texture2D texTransmittance;
 Texture2D texIrradiance;
 Texture3D texInscatter;
@@ -38,15 +30,6 @@ cbuffer Other
 {
 	float3 sunVector;
 	float sunIntensity = 22.0;
-};
-
-cbuffer Camera
-{
-	float3 wPosCamera;
-	float near_plane;
-	float far_plane;
-	float fov;
-	float4 farfrustumCornersVS[4];
 	float4x4 IView;
 };
 
@@ -217,7 +200,7 @@ VS_OUT VS(VS_IN input)
 	VS_OUT output;
 	output.pos = float4(input.pos, 1);
 	output.tex = input.texAndCornerIndex.xy;
-	float3 farCorner = farfrustumCornersVS[input.texAndCornerIndex.z];
+	float3 farCorner = frustumCornersVS[input.texAndCornerIndex.z];
 	output.farfrustumCornerViewSpace = mul(float4(farCorner, 0), IView);
 	return output;
 }
@@ -234,7 +217,7 @@ float4 PS(VS_OUT input) : SV_Target0
 
 	// multiply view space depth by a ray that passes through this pixel on 
 	// its way to the far clip plane
-	float3 viewdir = normalize(cameraToFar);
+	float3 viewdir = cameraToFar; //normalize(cameraToFar);
 	float3 surfacePos = wPosCamera + cameraToFar * depth;  //wPosCamera + cameraToNear + depth * nearToFar;
 
 	// obtaining the view direction vector

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Stratum.Graphics.RenderCommands
 {
-    interface IRenderDeferredCommand : IRenderCommand
+    public interface IRenderDeferredCommand : IRenderCommand
     {
         // todo: is anything needed in here?
     }

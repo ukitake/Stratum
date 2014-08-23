@@ -17,7 +17,6 @@ namespace Stratum.World.Earth
     {
         protected TerrainNode[] rootNodes;
         protected Buffer<TerrainVertex> vertexBuffer;
-        protected Buffer<int> indexBuffer;
 
         protected Dictionary<string, GraphicsResource> resources;
 
@@ -40,17 +39,9 @@ namespace Stratum.World.Earth
         {
             GraphicsDevice device = Engine.GraphicsContext.Device;
 
-            wireFrame = EffectLoader.Load(@"Graphics/Shaders/Wireframe.fx");
+            wireFrame = EffectLoader.Load(@"World/Earth/Shaders/DeferredTerrain.fx");
 
-            int[] indices = new int[5000 * 12];
-
-            for (int i = 0; i < 5000; i++)
-            {
-                fillIndices(i, indices);
-            }
-
-            vertexBuffer = Buffer<TerrainVertex>.New<TerrainVertex>(device, SharpDX.Utilities.SizeOf<TerrainVertex>() * 4 * 5000, BufferFlags.VertexBuffer, SharpDX.Direct3D11.ResourceUsage.Dynamic);
-            indexBuffer = Buffer<int>.New(device, indices, BufferFlags.IndexBuffer);
+            vertexBuffer = Buffer<TerrainVertex>.New<TerrainVertex>(device, SharpDX.Utilities.SizeOf<TerrainVertex>() * 4 * 1000, BufferFlags.VertexBuffer, SharpDX.Direct3D11.ResourceUsage.Dynamic);
         }
 
         public override void Update(GameTime gameTime)
@@ -69,7 +60,7 @@ namespace Stratum.World.Earth
 
         protected override IRenderCommand GenerateRenderCommand()
         {
-            return new RenderCommand<TerrainVertex>(
+            return new RenderDeferredCommand<TerrainVertex>(
                 wireFrame,
                 PrimitiveType.PatchList(4),
                 vertexBuffer,
@@ -79,9 +70,13 @@ namespace Stratum.World.Earth
                 Engine.GraphicsContext.Device.BlendStates.Opaque, rasterizer: Engine.GraphicsContext.Device.RasterizerStates.CullBack);
         }
 
+        private Stratum.Graphics.DirectionalLight dlight = new Graphics.DirectionalLight(new Vector3(0, 0, -1), Color.White);
+
         public override void QueueRenderCommands(GameTime gameTime, Renderer renderer, IGraphicsContext context)
         {
             List<TerrainNode> nodesToRender = new List<TerrainNode>();
+
+            renderer.EnqueueLight(dlight);
 
             // todo: maybe can parallelize
             for (int i = 0; i < rootNodes.Length; i++)
@@ -101,21 +96,10 @@ namespace Stratum.World.Earth
                 TerrainVertex[] vertices = nodesToRender.SelectMany(node => node.Geometry).ToArray();
 
                 var command = GenerateRenderCommand();
-                (command as RenderCommand<TerrainVertex>).NumVertices = vertices.Length;
+                (command as RenderDeferredCommand<TerrainVertex>).NumVertices = vertices.Length;
                 vertexBuffer.SetData(vertices);
 
-                renderer.EnqueueNormal(command);
-
-                //context.Device.SetRasterizerState(context.Device.RasterizerStates.CullBack);
-                //context.Device.SetDepthStencilState(context.Device.DepthStencilStates.Default);
-                //context.Device.SetBlendState(context.Device.BlendStates.Opaque);
-
-                //context.GBuffer.SetShaderParameters(this.Object);
-                //context.GBuffer.SetCameraParameters(context.CurrentCamera);
-                //wireFrame.Parameters["World"].SetValue(this.Object.World.ToMatrix());
-                //wireFrame.Parameters["View"].SetValue(context.CurrentCamera.View);
-                //wireFrame.Parameters["Proj"].SetValue(context.CurrentCamera.Proj);
-                //Engine.Renderer.RenderGeometry(PrimitiveType.PatchList(4), vertexBuffer,  nodeCount * 4, wireFrame);
+                renderer.EnqueueDeferred(command as IRenderDeferredCommand);
             }
         }
 
@@ -133,43 +117,6 @@ namespace Stratum.World.Earth
                     //root.LastRendered = DateTime.Now;
                     toRender.Add(root);
                 }
-            }
-        }
-
-        //private TerrainVertex[] nodeToGeometry(TerrainNode node)
-        //{
-        //    return new TerrainVertex[4] 
-        //    {
-        //        new TerrainVertex(new Vector3((float)MathUtilD.DegreesToRadians(node.TL.Longitude), (float)MathUtilD.DegreesToRadians(node.TL.Latitude), 0f), new Vector2(0f, 0f)),
-        //        new TerrainVertex(new Vector3((float)MathUtilD.DegreesToRadians(node.TR.Longitude), (float)MathUtilD.DegreesToRadians(node.TR.Latitude), 0f), new Vector2(1f, 0f)),
-        //        new TerrainVertex(new Vector3((float)MathUtilD.DegreesToRadians(node.BR.Longitude), (float)MathUtilD.DegreesToRadians(node.BR.Latitude), 0f), new Vector2(1f, 1f)),
-        //        new TerrainVertex(new Vector3((float)MathUtilD.DegreesToRadians(node.BL.Longitude), (float)MathUtilD.DegreesToRadians(node.BL.Latitude), 0f), new Vector2(0f, 1f))
-        //    };
-        //}
-
-        private int[] getIndices(int nodeIndex)
-        {
-            var indices = new int[12]
-            {
-                1,2,4,  2,3,4,  3,0,4,  0,1,4
-            };
-
-            for (int i = 0; i < 12; i++)
-            {
-                indices[i] += nodeIndex * 5;
-            }
-
-            return indices;
-        }
-
-        private void fillIndices(int nodeIndex, int[] indices)
-        {
-            var ind = getIndices(nodeIndex);
-            int startIndex = nodeIndex * 12;
-
-            for (int i = 0; i < 12; i++)
-            {
-                indices[startIndex + i] = ind[i];
             }
         }
     }

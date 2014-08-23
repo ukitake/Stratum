@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Stratum.Graphics.RenderCommands
 {
-    class RenderCommand<T> : IRenderCommand
+    public class RenderCommand<T> : IRenderCommand
         where T : struct
     {
         public RenderCommand(

@@ -424,13 +424,8 @@ float4 PS_DLight(VS_OUT_DLight input) : SV_Target0
 		clip(-1);
 	}
 
-	// multiply view space depth by a ray that passes through this pixel on 
-	// its way to the far clip plane
-	// TODO THIS IS WRONG... frustum should not be in world space but it is
-	float3 vsPosition = depth * far_plane * normalize(input.frustumCornerViewSpace);
-
-	float3 color = saturate(dot(-dLightDirection, normal)) * albedo.rgb * (vsPosition / vsPosition);
-	return float4(color, 1.0);
+	float3 color = saturate(dot(-dLightDirection, normal)) * albedo.rgb;
+	return float4(albedo.rgb, 1.0);
 }
 
 /////////////////////////////////////////////////////

@@ -84,6 +84,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cesium\ExtensionHeader.cs" />
+    <Compile Include="Cesium\FastBinaryReader.cs" />
+    <Compile Include="Cesium\IndexData.cs" />
+    <Compile Include="Cesium\NormalExtensionData.cs" />
+    <Compile Include="Cesium\QuantizedMeshHeader.cs" />
+    <Compile Include="Cesium\QuantizedMeshTileParser.cs" />
+    <Compile Include="Cesium\VertexData.cs" />
     <Compile Include="Components\IRenderableComponent.cs" />
     <Compile Include="Components\RenderableComponent.cs" />
     <Compile Include="GIS\LatLon.cs" />
@@ -103,6 +110,7 @@
     <Compile Include="Graphics\RenderContext.cs" />
     <Compile Include="Math\CompGeom\BoundingVolumes\AxisAlignedBoundingBox.cs" />
     <Compile Include="Math\CompGeom\BoundingVolumes\BoundingFrustum.cs" />
+    <Compile Include="Math\CompGeom\BoundingVolumes\BoundingFrustumD.cs" />
     <Compile Include="Math\CompGeom\BoundingVolumes\BoundingSphere.cs" />
     <Compile Include="Math\CompGeom\BoundingVolume.cs" />
     <Compile Include="Math\CompGeom\Primitives\Cylinder.cs" />
@@ -112,6 +120,7 @@
     <Compile Include="Math\CompGeom\Primitives\LineSegment.cs" />
     <Compile Include="Math\CompGeom\Primitives\Plane.cs" />
     <Compile Include="Math\CompGeom\Primitive.cs" />
+    <Compile Include="Math\CompGeom\Primitives\PlaneD.cs" />
     <Compile Include="Math\CompGeom\Primitives\Ray.cs" />
     <Compile Include="Math\CompGeom\Primitives\Triangle.cs" />
     <Compile Include="Components\Component.cs" />
@@ -162,7 +171,7 @@
     <Compile Include="Object\SceneNode.cs" />
     <Compile Include="Object\Spatial.cs" />
     <Compile Include="SceneGraph.cs" />
-    <Compile Include="World\Earth\CesiumTerrainNode.cs" />
+    <Compile Include="World\Earth\HemisphereTerrainNode.cs" />
     <Compile Include="World\Earth\PlanetComponent.cs" />
     <Compile Include="World\Earth\Quadrant.cs" />
     <Compile Include="World\Space\Astronomy.cs" />
@@ -188,10 +197,19 @@
     <Content Include="Graphics\Fonts\Arial16.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Graphics\Shaders\dsfun90.fx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Graphics\Shaders\Common.fx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Graphics\Shaders\CopyTextureToTarget.fx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Graphics\Shaders\GBufferCommon.fx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Graphics\Shaders\GBuffer.fx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Graphics\Shaders\GBufferUber.fx">
@@ -237,6 +255,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="World\Atmosphere\Shaders\transmittance.fx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="World\Earth\Shaders\DeferredTerrain.fx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="World\Earth\Shaders\ForwardTerrain.fx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

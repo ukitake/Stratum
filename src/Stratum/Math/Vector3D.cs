@@ -439,6 +439,16 @@ namespace Stratum
             return new Vector3D(vec1.X / vec2.X, vec1.Y / vec2.Y, vec1.Z / vec2.Z);
         }
 
+        public static bool operator ==(Vector3D vec1, Vector3D vec2)
+        {
+            return vec1.X == vec2.X && vec1.Y == vec2.Y && vec1.Z == vec2.Z;
+        }
+
+        public static bool operator !=(Vector3D vec1, Vector3D vec2)
+        {
+            return vec1.X != vec2.X || vec1.Y != vec2.Y || vec1.Z != vec2.Z;
+        }
+
         public static Vector3D Average(params Vector3D[] vecs)
         {
             Vector3D sum = Vector3D.Zero;

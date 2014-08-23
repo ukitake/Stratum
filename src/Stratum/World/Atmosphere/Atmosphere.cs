@@ -5,11 +5,79 @@ using System.Text;
 using SharpDX;
 using SharpDX.Toolkit.Graphics;
 using Stratum.Graphics;
+using Stratum.Components;
+using Stratum.Graphics.RenderCommands;
+using Stratum.CompGeom;
 
 namespace Stratum.WorldEngine
 {
-    public class Atmosphere : IRender
+    public class Atmosphere : RenderableComponent
     {
+        private class AtmosphereRenderCommand : RenderCommand<LightQuadVertex>
+        {
+            public AtmosphereRenderCommand(
+                Effect effect,
+                PrimitiveType primitiveType,
+                SharpDX.Toolkit.Graphics.Buffer<LightQuadVertex> vertexBuffer,
+                int numVertices,
+                Dictionary<string, GraphicsResource> resources,
+                Matrix world,
+                BlendState blend = null,
+                DepthStencilState depthStencil = null,
+                RasterizerState rasterizer = null,
+                string technique = null)
+                : base(effect, primitiveType, vertexBuffer, numVertices, resources, world, blend, depthStencil, rasterizer, technique)
+            {
+            }
+
+            public override void SetConstants(IGraphicsContext context)
+            {
+                // set camera parameters
+                var camera = context.CurrentCamera;
+
+                Effect.Parameters["wPosCamera"].SetValue(camera.Position);
+                Effect.Parameters["near_plane"].SetValue((float)camera.NearPlane);
+                Effect.Parameters["far_plane"].SetValue((float)camera.FarPlane);
+                Effect.Parameters["fov"].SetValue((float)camera.FieldOfView);
+
+                Vector3D[] frustumCornersWS = new Vector3D[8];
+                Vector3D[] farFrustumCornersWS = new Vector3D[4];
+                Vector3D[] farFrustumCornersVS = new Vector3D[4];
+                MatrixD view = camera.ViewD;
+
+                BoundingFrustumD frustum = new BoundingFrustumD(context.RenderContext.ViewProjD);
+                frustum.GetCorners(frustumCornersWS);
+
+                //  2 ____________  1
+                //   |            |
+                //   |            |
+                //   |            |
+                //  3|____________| 0
+                //
+                for (int i = 4; i < 8; i++)
+                {
+                    farFrustumCornersWS[i - 4] = frustumCornersWS[i];
+                }
+
+                Vector3D.TransformCoordinate(farFrustumCornersWS, ref view, farFrustumCornersVS);
+
+                Vector3D[] o = new Vector3D[4];
+                Vector4D[] o4 = new Vector4D[4];
+                for (int i = 0; i < 4; i++)
+                {
+                    Vector3D.Normalize(ref farFrustumCornersVS[i], out o[i]);
+                    o4[i] = new Vector4D(o[i], 1.0);
+                }
+
+                Effect.Parameters["frustumCornersVS"].SetValue(o4.Select(v => v.ToVector4()).ToArray());
+                view.Invert();
+                Effect.Parameters["IView"].SetValue(view.ToMatrix());
+
+                // set sun parameters
+                Effect.Parameters["sunVector"].SetValue(new Vector3(0, 0, 1));
+            }
+        }
+
         private struct LightQuadVertex
         {
             public LightQuadVertex(float x, float y, float z, float tx, float ty, float index)
@@ -82,16 +150,16 @@ namespace Stratum.WorldEngine
             deltaSMT = RenderTarget3D.New(device, RES_MU_S * RES_NU, RES_MU, RES_R, PixelFormat.R16G16B16A16.Float);
             deltaJT = RenderTarget3D.New(device, RES_MU_S * RES_NU, RES_MU, RES_R, PixelFormat.R16G16B16A16.Float);
 
-            atmosphere = EffectLoader.Load(@"WorldEngine/Atmosphere/Shaders/atmosphere.fx");
-            copyInscatter1 = EffectLoader.Load(@"WorldEngine/Atmosphere/Shaders/copyInscatter1.fx");
-            copyInscatterN = EffectLoader.Load(@"WorldEngine/Atmosphere/Shaders/copyInscatterN.fx");
-            copyIrradiance = EffectLoader.Load(@"WorldEngine/Atmosphere/Shaders/copyIrradiance.fx");
-            inscatter1 = EffectLoader.Load(@"WorldEngine/Atmosphere/Shaders/inscatter1.fx");
-            inscatterN = EffectLoader.Load(@"WorldEngine/Atmosphere/Shaders/inscatterN.fx");
-            inscatterS = EffectLoader.Load(@"WorldEngine/Atmosphere/Shaders/inscatterS.fx");
-            irradiance1 = EffectLoader.Load(@"WorldEngine/Atmosphere/Shaders/irradiance1.fx");
-            irradianceN = EffectLoader.Load(@"WorldEngine/Atmosphere/Shaders/irradianceN.fx");
-            transmittance = EffectLoader.Load(@"WorldEngine/Atmosphere/Shaders/transmittance.fx");
+            atmosphere = EffectLoader.Load(@"World/Atmosphere/Shaders/atmosphere.fx");
+            copyInscatter1 = EffectLoader.Load(@"World/Atmosphere/Shaders/copyInscatter1.fx");
+            copyInscatterN = EffectLoader.Load(@"World/Atmosphere/Shaders/copyInscatterN.fx");
+            copyIrradiance = EffectLoader.Load(@"World/Atmosphere/Shaders/copyIrradiance.fx");
+            inscatter1 = EffectLoader.Load(@"World/Atmosphere/Shaders/inscatter1.fx");
+            inscatterN = EffectLoader.Load(@"World/Atmosphere/Shaders/inscatterN.fx");
+            inscatterS = EffectLoader.Load(@"World/Atmosphere/Shaders/inscatterS.fx");
+            irradiance1 = EffectLoader.Load(@"World/Atmosphere/Shaders/irradiance1.fx");
+            irradianceN = EffectLoader.Load(@"World/Atmosphere/Shaders/irradianceN.fx");
+            transmittance = EffectLoader.Load(@"World/Atmosphere/Shaders/transmittance.fx");
 
             QuadVert[] verts = new QuadVert[6]
             {
@@ -266,43 +334,9 @@ namespace Stratum.WorldEngine
             atmosVb = SharpDX.Toolkit.Graphics.Buffer.New<LightQuadVertex>(device, lightVerts, BufferFlags.VertexBuffer);
         }
 
-        private void SetCameraParameters(Camera camera)
-        {
-            atmosphere.Parameters["wPosCamera"].SetValue(camera.Position);
-            atmosphere.Parameters["near_plane"].SetValue(camera.NearPlane);
-            atmosphere.Parameters["far_plane"].SetValue(camera.FarPlane);
-            atmosphere.Parameters["fov"].SetValue(camera.FieldOfView);
-
-            Vector3[] frustumCornersWS = new Vector3[8];
-            Vector3[] farFrustumCornersWS = new Vector3[4];
-            Vector4[] farFrustumCornersVS = new Vector4[4];
-            Matrix view = camera.ViewD.ToMatrix();
-
-            MatrixD viewProj = MatrixD.Multiply(camera.ViewD, camera.ProjD);
-            BoundingFrustum frustum = new BoundingFrustum(viewProj.ToMatrix());
-            frustum.GetCorners(frustumCornersWS);
-
-            //  2 ____________  1
-            //   |            |
-            //   |            |
-            //   |            |
-            //  3|____________| 0
-            //
-            for (int i = 4; i < 8; i++)
-            {
-                farFrustumCornersWS[i - 4] = frustumCornersWS[i];
-            }
-
-            Vector3.Transform(farFrustumCornersWS, ref view, farFrustumCornersVS);
-
-            atmosphere.Parameters["farfrustumCornersVS"].SetValue(farFrustumCornersVS);
-            view.Invert();
-            atmosphere.Parameters["IView"].SetValue(view);
-        }
-
         private void SetSunParameters()
         {
-            atmosphere.Parameters["sunVector"].SetValue(new Vector3(0, 1, 0));
+            atmosphere.Parameters["sunVector"].SetValue(new Vector3(0, 0, -1));
         }
 
         private void SetTextures(IGraphicsContext context)
@@ -315,19 +349,41 @@ namespace Stratum.WorldEngine
             atmosphere.Parameters["texInscatter"].SetResource(inscatterT);
         }
 
-        public void QueueRenderCommands(SharpDX.Toolkit.GameTime gameTime, Renderer renderer, IGraphicsContext context)
+        private Dictionary<string, GraphicsResource> resourcesDic;
+
+        public override void QueueRenderCommands(SharpDX.Toolkit.GameTime gameTime, Renderer renderer, IGraphicsContext context)
         {
+            if (resourcesDic == null)
+            {
+                resourcesDic = new Dictionary<string, GraphicsResource>();
+                resourcesDic["gbDepthTexture"] = context.GBuffer.DepthTarget;
+                resourcesDic["gbNormalTexture"] = context.GBuffer.NormalTarget;
+                resourcesDic["gbAlbedoTexture"] = context.GBuffer.AlbedoTarget;
+                resourcesDic["texTransmittance"] = transmittanceT;
+                resourcesDic["texIrradiance"] = irradianceT;
+                resourcesDic["texInscatter"] = inscatterT;
+            }
+
+            var command = GenerateRenderCommand();
+            renderer.EnqueuePostProcess(command);
+
             // post process 
-            SetCameraParameters(context.CurrentCamera);
-            SetSunParameters();
-            SetTextures(context);
+            //SetCameraParameters(context.CurrentCamera);
+            //SetSunParameters();
+            //SetTextures(context);
 
-            context.Device.SetBlendState(context.Device.BlendStates.AlphaBlend);
+            //context.Device.SetBlendState(context.Device.BlendStates.AlphaBlend);
 
-            context.Device.SetVertexBuffer(atmosVb);
-            context.Device.SetVertexInputLayout(VertexInputLayout.FromBuffer(0, atmosVb));
-            atmosphere.Techniques["Atmosphere"].Passes[0].Apply();
-            context.Device.Draw(PrimitiveType.TriangleList, 6);
+            //context.Device.SetVertexBuffer(atmosVb);
+            //context.Device.SetVertexInputLayout(VertexInputLayout.FromBuffer(0, atmosVb));
+            //atmosphere.Techniques["Atmosphere"].Passes[0].Apply();
+            //context.Device.Draw(PrimitiveType.TriangleList, 6);
+        }
+
+        protected override IRenderCommand GenerateRenderCommand()
+        {
+            return new AtmosphereRenderCommand(atmosphere, PrimitiveType.TriangleList, atmosVb, 6,
+                resourcesDic, this.Object.World.ToMatrix(), Engine.GraphicsContext.Device.BlendStates.AlphaBlend, null, null, "Atmosphere");
         }
     }
 }
